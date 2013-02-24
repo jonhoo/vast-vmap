@@ -1,0 +1,14 @@
+{
+    "name": "jonhoo/vast-vmap",
+    "description": "JavaScript library for working with the IAB VAST and VMAP standards",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Jon Gjengset",
+            "email": "jon@tsp.io"
+        }
+    ],
+    "require": {
+
+    }
+}

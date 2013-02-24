@@ -1,0 +1,20 @@
+{
+    "author": "Jon Gjengset <jon@tsp.io>",
+    "contributors": [ ],
+    "name": "vast-vmap",
+    "description": "JavaScript library for working with the IAB VAST and VMAP standards",
+    "version": "0.0.1",
+    "homepage": "https://github.com/jonhoo/vast-vmap",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/jonhoo/vast-vmap"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT"
+        }
+    ],
+    "private": false,
+    "optionalDependencies": {}
+}
