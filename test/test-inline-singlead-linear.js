@@ -24,16 +24,4 @@ buster.testCase("Single Inline Ad", {
     assert.equals(this.ad.linear.clickThrough, "http://linear.test.com");
   },
 
-  "finds companion #1 click through": function() {
-    assert.equals(this.ad.companions[0].clickThrough, "http://companion1.test.com");
-  },
-
-  "finds companion #2 click through": function() {
-    assert.equals(this.ad.companions[1].clickThrough, "http://companion2.test.com");
-  },
-
-  "finds companions": function() {
-    assert.equals(this.ad.companions.length, 2);
-  },
-
 })

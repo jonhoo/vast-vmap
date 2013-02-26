@@ -140,13 +140,17 @@ TrackingEvents.prototype.addClickTracking = function(url) {
  */
 TrackingEvents.prototype.getEventsOfTypes = function(evts) {
   var ret = [];
-  var includeProgress = evs.indexOf('progress') > -1;
+  var includeProgress = evts.indexOf('progress') > -1;
 
-  this.events.forEach(function(evs, e) {
-    if (evts.indexOf(e) > -1 || (includeProgress && e === "progress")) {
-      ret = ret.concat(evs);
+  for (var e in this.events) {
+    if (!this.events.hasOwnProperty(e)) {
+      continue;
     }
-  });
+
+    if (evts.indexOf(e) > -1 || (includeProgress && e.indexOf("progress-") === 0)) {
+      ret = ret.concat(this.events[e]);
+    }
+  };
 
   return ret;
 };
@@ -320,7 +324,18 @@ VMAP.prototype.onBreakEnd = function(break_index) {
  */
 function queryVAST(endpoint, onFetched, parentAd) {
   fetchXML(endpoint, null, function(doc) {
-    new VASTAds(doc, onFetched, parentAd);
+    try {
+      new VASTAds(doc, onFetched, parentAd);
+    } catch(e) {
+      console.error(e.toString());
+      var s = e.stack.split(/\n/);
+      for (var i = 0; i < s.length; i++) {
+        var msg = s[i];
+        msg = msg.replace("[arguments not available]", "");
+        msg = msg.replace(/http:\/\/.*?resources\//, "");
+        console.debug("\t" + msg);
+      }
+    }
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
     onFetched(null);
@@ -341,6 +356,8 @@ function queryVAST(endpoint, onFetched, parentAd) {
  *   getBestAd(). Will be passed this VASTAds object. Should be null if no
  *   callback is required. The call to getBestAd() might change over time as
  *   more ads become available.
+ *
+ * TODO: onAdsFetched -> onAdsAvailable
  */
 function VASTAds(root, onAdsFetched, parentAd) {
   this.ads = [];
@@ -348,6 +365,7 @@ function VASTAds(root, onAdsFetched, parentAd) {
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
+    // TODO: needs to check current() and hasSequence()
     if (ad.isEmpty()) {
       continue;
     }
@@ -1004,7 +1022,8 @@ var VAST_LINEAR_TRACKING_POINTS = ['start',
  *
  * Note that this function will include points for the start, complete,
  * firstQuartile, midpoint and thirdQuartile events, so these need not be
- * explicitly added
+ * explicitly added. There MAY be multiple events with the same offset, in which
+ * case track must be called for each one with their respective event names.
  *
  * The list will only include points that the VAST response explicitly request
  * tracking for.
@@ -1013,37 +1032,38 @@ VASTLinear.prototype.getTrackingPoints = function() {
   var events = this.tracking.getEventsOfTypes(VAST_LINEAR_TRACKING_POINTS);
   var points = [];
   for (var i = 0; i < events.length; i++) {
+    var point = {"event": events[i]["event"], "offset": null};
     switch (events[i]["event"]) {
       case "start":
-        points.push("start");
+        point["offset"] = "start";
         break;
       case "firstQuartile":
-        points.push(0.25);
+        point["offset"] = "25%";
         break;
       case "midpoint":
-        points.push(0.50);
+        point["offset"] = "50%";
         break;
       case "thirdQuartile":
-        points.push(0.75);
+        point["offset"] = "75%";
         break;
       case "complete":
-        points.push("end");
+        point["offset"] = "end";
         break;
-      case "progress":
+      default:
+        // progress-...
         var offset = events[i]["offset"];
         if (!offset) {
           continue;
         }
 
-        if (offset.indexOf('%') > -1) {
-          points.push(offset);
-        } else if (offset.indexOf(':') > -1) {
+        if (offset.indexOf(':') > -1) {
           offset = parseInt(offset.substr(0,2), 10) * 3600
                  + parseInt(offset.substr(3,2), 10) * 60
                  + parseInt(offset.substr(6,2), 10);
-          points.push(offset);
         }
+        point["offset"] = offset;
     }
+    points.push(point);
   }
 
   return points;
@@ -1060,7 +1080,7 @@ function VASTStatic(ad, root) {
   this.resources = {
     "iframe": null,
     "html": null,
-    "images": []
+    "images": {}
   };
 
   var res;

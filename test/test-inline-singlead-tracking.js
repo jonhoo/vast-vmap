@@ -1,4 +1,30 @@
-buster.testCase("Tracking lib", {
+function containsMatch(haystack, needle) {
+  for (var i in haystack) {
+    if (!haystack.hasOwnProperty(i)) { continue; }
+
+    try {
+      assert.match(haystack[i], needle);
+      return true;
+    } catch (e) { }
+  }
+
+  return false;
+}
+
+buster.assertions.add("containsMatch", {
+    assert: function (haystack, needle) {
+      var f = buster.assertions.fail;
+      buster.assertions.fail = function (message) { throw new AssertionError(message) };
+      var cm = containsMatch(haystack, needle);
+      buster.assertions.fail = f;
+      return cm;
+    },
+    assertMessage: "${0} expected to contain match for ${1}!",
+    refuteMessage: "${0} expected not to contain match for ${1}!",
+    expectation: "toContainMatch",
+});
+
+buster.testCase("Single inline ad tracking", {
   prepare: function(done) {
     var that = this;
     queryVAST("./test/assets/vast_inline_linear.xml", function(ads) {
@@ -77,6 +103,35 @@ buster.testCase("Tracking lib", {
       assert.match(this.server.requests[i], {
           method: "get",
           url: "/" + evs[i]
+      });
+    }
+  },
+
+  "parses absolute progress offset": function() {
+    assert.containsMatch(this.ad.linear.getTrackingPoints(), {
+      "offset": 3661
+    });
+  },
+
+  "parses percentage progress offset": function() {
+    assert.containsMatch(this.ad.linear.getTrackingPoints(), {
+      "offset": "10%"
+    });
+  },
+
+  "gets tracking points from non-progress events": function() {
+    var match = {
+      "start": "start",
+      "firstQuartile": "25%",
+      "midpoint": "50%",
+      "thirdQuartile": "75%",
+      "end": "end"
+    };
+
+    for (var ev in match) {
+      assert.containsMatch(this.ad.linear.getTrackingPoints(), {
+        "event": ev,
+        "offset": match[ev]
       });
     }
   },

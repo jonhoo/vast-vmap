@@ -1,4 +1,4 @@
-buster.testCase("Media Files lib", {
+buster.testCase("Single inline ad media files", {
   prepare: function(done) {
     var that = this;
     queryVAST("./test/assets/vast_inline_linear.xml", function(ads) {
