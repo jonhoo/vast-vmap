@@ -32,8 +32,8 @@ var fetchXML = function(url, identifier, onSuccess, onFailure) {
     }
   };
 
-  request.open("get", url, true);
-  request.send();
+  request.open("GET", url, true);
+  request.send(null);
 }
 
 /**
@@ -100,13 +100,17 @@ TrackingEvents.prototype.finger = function(url) {
  * @param {TrackingEvents} other TrackingEvents object to merge in
  */
 TrackingEvents.prototype.augment = function(other) {
-  other.events.forEach(function(evs, e) {
-    if (!this.events[e]) {
-      this.events[e] = evs;
-    } else {
-      this.events[e] = this.events[e].concat(evs);
+  for (var e in other.events) {
+    if (!other.events.hasOwnProperty(e)) {
+      continue;
     }
-  });
+
+    if (!this.events[e]) {
+      this.events[e] = other.events[e];
+    } else {
+      this.events[e] = this.events[e].concat(other.events[e]);
+    }
+  };
 };
 
 /**
@@ -381,15 +385,18 @@ function VASTAds(root, onAdsFetched, parentAd) {
       }
     } else {
       var that = this;
-      var wrapper = adElements.item(i).getElementsByTagNameNS(root.namespaceURI, 'Wrapper').item(0);
-      var uri = wrapper
-                .getElementsByTagNameNS(root.namespaceURI, 'VASTAdTagURI')
-                .textContent
-                .replace(/\s/g, "");
+      var wrapper = adElements.item(i).getElementsByTagName('Wrapper').item(0);
+      var uri = wrapper.getElementsByTagName('VASTAdTagURI');
+      if (uri.length === 0) {
+        // No uri...
+        continue;
+      }
+
+      uri = uri.item(0).textContent.replace(/\s/g, "");
       var allowPods = wrapper.getAttribute("allowMultipleAds") === "true";
 
       var onGotFirstAd = function(ads) {
-        ad.loaded(ads, allowPods);
+        ad.onLoaded(ads, allowPods);
         if (that.onAdsFetched) {
           that.onAdsFetched.call(that, that);
         }
@@ -513,7 +520,7 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
     inline = root.getElementsByTagName("Wrapper");
     // Note here that VASTAds will automatically fetch wrapped responses for us,
     // so we don't need to do anything special with it here
-    if (wrapper.length === 0) {
+    if (inline.length === 0) {
       this.hasContent = false;
       // TODO: error tracking
       return;
@@ -618,7 +625,7 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
  *
  * @param {VASTAds} ads VASTAds object wrapped by this ad
  */
-VASTAd.prototype.loaded = function(ads, allowPods) {
+VASTAd.prototype.onLoaded = function(ads, allowPods) {
   this.pod = ads;
   this.currentPodAd = ads.getAd(allowPods);
 

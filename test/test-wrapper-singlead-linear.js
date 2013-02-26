@@ -1,7 +1,8 @@
-buster.testCase("Single inline ad", {
+buster.testCase("Single wrapped ad", {
   prepare: function(done) {
     var that = this;
-    queryVAST("./test/assets/vast_inline_linear.xml", function(ads) {
+    this.timeout = 500;
+    queryVAST("./test/assets/vast_wrapper_linear_1.xml", function(ads) {
       that.vast = ads;
       done();
     });
