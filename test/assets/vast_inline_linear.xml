@@ -35,6 +35,28 @@
         </MediaFiles>
       </Linear>
     </Creative>
+    <Creative AdID="602678-NonLinear">
+      <NonLinearAds>
+        <TrackingEvents>
+          <Tracking event="creativeView">/nlcreativeView</Tracking>
+          <Tracking event="expand">/nlexpand</Tracking>
+          <Tracking event="collapse">/nlcollapse</Tracking>
+          <Tracking event="acceptInvitation">/nlacceptInvitation</Tracking>
+          <Tracking event="close">/nlclose</Tracking>
+        </TrackingEvents>
+        <NonLinear height="50" width="300" minSuggestedDuration="00:00:15">
+          <StaticResource creativeType="image/jpeg">nonlinear.jpg</StaticResource>
+          <NonLinearClickThrough>http://nonlinear1.test.com</NonLinearClickThrough>
+        </NonLinear>
+        <NonLinear height="50" width="450" id="nlad" minSuggestedDuration="00:00:20">
+          <IFrameResource>/nonlinearframe</IFrameResource>
+          <NonLinearClickThrough>http://nonlinear2.test.com</NonLinearClickThrough>
+        </NonLinear>
+        <NonLinear>
+          <HTMLResource>nonlinear.html</HTMLResource>
+        </NonLinear>
+      </NonLinearAds>
+    </Creative>
     <Creative AdID="601364-Companion">
       <CompanionAds>
         <Companion width="300" height="250">
@@ -52,7 +74,6 @@
         </Companion>
         <Companion id="ad">
           <HTMLResource>page.html</HTMLResource>
-          <CompanionClickThrough>http://companion2.test.com</CompanionClickThrough>
         </Companion>
       </CompanionAds>
     </Creative>

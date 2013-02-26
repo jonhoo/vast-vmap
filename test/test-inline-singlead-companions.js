@@ -41,7 +41,7 @@ buster.testCase("Single inline ad companions", {
     assert.match(this.ad.companions[1].getAllResources(), {"iframe": "/frame"});
   },
 
-  "finds StaticResource": function() {
+  "finds HTMLResource": function() {
     assert.match(this.ad.companions[2].getAllResources(), {"html": "page.html"});
   },
 
@@ -51,6 +51,10 @@ buster.testCase("Single inline ad companions", {
 
   "finds companion #2 click through": function() {
     assert.equals(this.ad.companions[1].clickThrough, "http://companion2.test.com");
+  },
+
+  "doesn't find non-existing companion click through": function() {
+    assert.isNull(this.ad.companions[2].clickThrough);
   },
 
   "doesn't find non-existing": function() {

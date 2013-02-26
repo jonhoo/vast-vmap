@@ -66,6 +66,19 @@ buster.testCase("Single inline ad tracking", {
     });
   },
 
+  "tracks impression and creativeView on first creativeView track (nonlinear)": function() {
+    this.ad.nonlinears[0].track("creativeView", 1, "");
+    assert.equals(this.server.requests.length, 2);
+    assert.match(this.server.requests[1], {
+        method: "get",
+        url: "/impression"
+    });
+    assert.match(this.server.requests[0], {
+        method: "get",
+        url: "/nlcreativeView"
+    });
+  },
+
   "doesn't track impression on second creativeView track": function() {
     this.ad.linear.track("creativeView", 1, "");
     this.ad.linear.track("creativeView", 1, "");
@@ -83,6 +96,26 @@ buster.testCase("Single inline ad tracking", {
     assert.match(this.server.requests[0], {
         method: "get",
         url: "/firstCompanionCreativeView"
+    });
+  },
+
+  "tracks nonlinear creativeView": function() {
+    this.ad.nonlinears[0].track("creativeView", 1, "");
+    // 2 because of the impression tracking
+    assert.equals(this.server.requests.length, 2);
+    assert.match(this.server.requests[0], {
+        method: "get",
+        url: "/nlcreativeView"
+    });
+  },
+
+  "tracks nonlinear creativeView for all nonlinears": function() {
+    this.ad.nonlinears[1].track("creativeView", 1, "");
+    // 2 because of the impression tracking
+    assert.equals(this.server.requests.length, 2);
+    assert.match(this.server.requests[0], {
+        method: "get",
+        url: "/nlcreativeView"
     });
   },
 

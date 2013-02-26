@@ -162,10 +162,11 @@ TrackingEvents.prototype.getEventsOfTypes = function(evts) {
  * @param {object} macros Macros to replace in the tracking URIs
  */
 TrackingEvents.prototype.track = function(ev, macros) {
-  var evs = [].concat(this.events[ev]);
-  if (!evs) {
+  if (!this.events[ev] || this.events[ev].length === 0) {
     return;
   }
+
+  var evs = [].concat(this.events[ev]);
 
   for (var m in macros) {
     if (!macros.hasOwnProperty(m)) {
@@ -190,7 +191,8 @@ TrackingEvents.prototype.track = function(ev, macros) {
   }
 
   var that = this;
-  evs.forEach(function(e) {
+  for (var i = 0; i < evs.length; i++) {
+    var e = evs[i];
     var url = e["url"];
 
     // Standard dictates 8 digits of randomness
@@ -204,7 +206,7 @@ TrackingEvents.prototype.track = function(ev, macros) {
     };
 
     that.finger(url);
-  });
+  };
 };
 
 /**
@@ -780,6 +782,10 @@ VASTAd.prototype.getNonLinears = function() {
  */
 function VASTCreative(ad, root) {
   this.root = root;
+  this.clickThrough = null;
+  if (root.tagName === "NonLinear") {
+    root = root.parentNode;
+  }
   this.tracking = new TrackingEvents(root, ad);
 }
 
