@@ -37,18 +37,23 @@ buster.testCase("Single inline ad tracking", {
     this.ad = this.vast.getAd();
     // Reset the only value that is really modified.
     this.ad.sentImpression = false;
-    this.server = sinon.fakeServer.create();
+    this.server = this.sandbox.useFakeServer();
+  },
+
+  tearDown: function() {
+    this.server.restore();
+    delete this.server;
   },
 
   "tracks impression and creativeView on first creativeView track (linear)": function() {
     this.ad.linear.track("creativeView", 1, "");
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[1], {
-        method: "get",
+        method: "GET",
         url: "/impression"
     });
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/creativeView"
     });
   },
@@ -57,11 +62,11 @@ buster.testCase("Single inline ad tracking", {
     this.ad.companions[0].track("creativeView", 1, "");
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[1], {
-        method: "get",
+        method: "GET",
         url: "/impression"
     });
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/firstCompanionCreativeView"
     });
   },
@@ -70,11 +75,11 @@ buster.testCase("Single inline ad tracking", {
     this.ad.nonlinears[0].track("creativeView", 1, "");
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[1], {
-        method: "get",
+        method: "GET",
         url: "/impression"
     });
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/nlcreativeView"
     });
   },
@@ -84,7 +89,7 @@ buster.testCase("Single inline ad tracking", {
     this.ad.linear.track("creativeView", 1, "");
     assert.equals(this.server.requests.length, 3);
     assert.match(this.server.requests[2], {
-        method: "get",
+        method: "GET",
         url: "/creativeView"
     });
   },
@@ -94,7 +99,7 @@ buster.testCase("Single inline ad tracking", {
     // 2 because of the impression tracking
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/firstCompanionCreativeView"
     });
   },
@@ -104,7 +109,7 @@ buster.testCase("Single inline ad tracking", {
     // 2 because of the impression tracking
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/nlcreativeView"
     });
   },
@@ -114,7 +119,7 @@ buster.testCase("Single inline ad tracking", {
     // 2 because of the impression tracking
     assert.equals(this.server.requests.length, 2);
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/nlcreativeView"
     });
   },
@@ -123,7 +128,7 @@ buster.testCase("Single inline ad tracking", {
     this.ad.linear.track("click", 1, "");
     assert.equals(this.server.requests.length, 1);
     assert.match(this.server.requests[0], {
-        method: "get",
+        method: "GET",
         url: "/click"
     });
   },
@@ -134,7 +139,7 @@ buster.testCase("Single inline ad tracking", {
       this.ad.linear.track(evs[i], 1, "");
       assert.equals(this.server.requests.length, i+1);
       assert.match(this.server.requests[i], {
-          method: "get",
+          method: "GET",
           url: "/" + evs[i]
       });
     }
