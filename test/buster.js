@@ -7,6 +7,7 @@ config["VAST tests"] = {
       "test/assets/*.xml"
     ],
     sources: [
+        "test/containsMatch.js",
         "src/vast-vmap.js"
     ],
     tests: [

@@ -49,6 +49,10 @@ function TrackingEvents(root, ad) {
   this.events = {};
   this.ad = ad;
 
+  if (root === null) {
+    return;
+  }
+
   if (root.tagName !== "TrackingEvents") {
     root = root.getElementsByTagName("TrackingEvents");
     if (root.length !== 1) {
@@ -82,6 +86,24 @@ function TrackingEvents(root, ad) {
     this.events[e].push(ev);
   }
 }
+
+/**
+ * Returns a new, but identical TrackingEvents object
+ *
+ * @param {VASTAd} ad The to associate the new copy with
+ */
+TrackingEvents.prototype.copy = function(ad) {
+  var n = Object.create(TrackingEvents.prototype);
+  n.events = {};
+  for (var e in this.events) {
+    if (this.events.hasOwnProperty(e)) {
+      n.events[e] = [].concat(this.events[e]);
+    }
+  }
+  n.ad = ad;
+  return n;
+};
+
 
 /**
  * Sends a GET request to the given URL
@@ -261,7 +283,7 @@ function VMAP(server, breakHandler, adHandler) {
       var adbreak = {
         ad: null,
         breakId: bn.getAttribute("breakId"),
-        tracking: new TrackingEvents(bn),
+        tracking: new TrackingEvents(bn, ad),
         position: position
       };
 
@@ -482,6 +504,7 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
   this.companions = [];
   this.companionsRequired = "none";
   this.nonlinears = [];
+  this.nonlinearsTracking = null;
   this.impressions = [];
   this.currentPodAd = this;
   this.sentImpression = false;
@@ -494,7 +517,6 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
     var pa = this.parentAd;
 
     this.companionsRequired = pa.companionsRequired;
-    this.impressions = this.impressions.concat(pa.impressions);
     this.linear = pa.linear ? pa.linear.copy(this) : null;
 
     if (pa.companions.length) {
@@ -508,6 +530,14 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
         this.companions.push(pa.nonlinears[i].copy(this));
       }
     }
+
+    if (pa.nonlinearsTracking !== null) {
+      this.nonlinearsTracking = pa.nonlinearsTracking.copy(this);
+    }
+  }
+
+  if (this.nonlinearsTracking === null) {
+    this.nonlinearsTracking = new TrackingEvents(null, this);
   }
 
   if (root.hasAttribute('sequence')) {
@@ -549,7 +579,6 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
   }
 
   creatives = creatives.item(0).getElementsByTagName("Creative");
-
   for (i = 0; i < creatives.length; i++) {
     var creative = creatives.item(i).firstChild;
 
@@ -595,16 +624,28 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
         var cls = tag === "Companion" ? VASTCompanion : VASTNonLinear;
         var arr = tag === "Companion" ? this.companions : this.nonlinears;
 
+        if (tag === "NonLinear") {
+          var track = new TrackingEvents(creative, this);
+          this.nonlinearsTracking.augment(track);
+        }
+
+        // Since we add to arr, we store the length to we don't start merging
+        // sibling elements.
+        var arrl = arr.length;
+
         var items = creative.getElementsByTagName(tag);
         for (var j = 0; j < items.length; j++) {
           n = new cls(this, items.item(j));
-          for (var k = 0; k < arr.length; k++) {
+
+          for (var k = 0; k < arrl; k++) {
             var o = arr[k];
             if (( o.attribute('id', true)     === n.attribute('id', false)) ||
                (  o.attribute('width', true)  === n.attribute('width', false)
                && o.attribute('height', true) === n.attribute('height', false))) {
               // Fallbacks to true|false there to prevent match when attribute
-              // not present
+              // not present. If we do this merge then the n is basically a copy
+              // of o, which is already in the array, so we don't want to add it
+              // again.
               o.augment(n);
               n = null;
             }
@@ -1208,6 +1249,7 @@ VASTCompanion.prototype.getAltText = function() {
  */
 function VASTNonLinear(ad, root) {
   VASTStatic.call(this, ad, root);
+  this.tracking = ad.nonlinearsTracking;
   VASTStatic.prototype.extractClicks.call(this, "NonLinear");
 }
 

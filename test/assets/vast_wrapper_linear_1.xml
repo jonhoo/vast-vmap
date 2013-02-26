@@ -21,11 +21,9 @@
           <Tracking event="pause">/wrapper/pause</Tracking>
           <Tracking event="resume">/wrapper/resume</Tracking>
           <Tracking event="fullscreen">/wrapper/fullscreen</Tracking>
+          <Tracking event="progress" offset="02:02:02">/wrapper/progabs</Tracking>
+          <Tracking event="progress" offset="20%">/wrapper/progrel</Tracking>
         </TrackingEvents>
-      </Linear>
-    </Creative>
-    <Creative>
-      <Linear>
         <VideoClicks>
           <ClickTracking>/wrapper/click</ClickTracking>
         </VideoClicks>
@@ -34,6 +32,7 @@
     <Creative AdID="602833-NonLinearTracking">
       <NonLinearAds>
         <TrackingEvents>
+          <Tracking event="creativeView">/wrapper/nlcreativeView</Tracking>
         </TrackingEvents>
       </NonLinearAds>
     </Creative>
