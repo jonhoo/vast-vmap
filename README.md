@@ -65,8 +65,9 @@ just haven't gotten around to them yet.
 
 # Testing #
 
-There are no tests. For now. Feel free to add them if you've got some
-good VAST/VMAP documents we can run tests on. I will be very grateful!
+I've added som rudimentary tests using BusterJS based on some VAST 2.0 XML files
+distributed by the IAB. Feel free to add more if you want to. Still need a good
+example VMAP document though...
 
 # Support #
 
