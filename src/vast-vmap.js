@@ -16,24 +16,19 @@ var VMAPNS = "http://www.iab.net/vmap-1.0";
  *   object if the response was not parsed as XML. The second parameter is the
  *   identifier.
  */
-function fetchXML(url, identifier, onSuccess, onFailure) {
-  var request = new XmlHttpRequest();
+var fetchXML = function(url, identifier, onSuccess, onFailure) {
+  var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
-    try {
-      if (request.readyState === 4) {
-        if (request.status === 200) {
-          if (request.responseXML !== null) {
-            onSuccess(request.responseXML, identifier);
-          } else {
-            onFailure(request, identifier);
-          }
+    if (request.readyState === 4) {
+      if (request.status === 200) {
+        if (request.responseXML !== null) {
+          onSuccess(request.responseXML, identifier);
         } else {
           onFailure(request, identifier);
         }
+      } else {
+        onFailure(request, identifier);
       }
-    }
-    catch(e) {
-      onFailure(e, identifier);
     }
   };
 
@@ -51,7 +46,7 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  *   ad impression.
  */
 function TrackingEvents(root, ad) {
-  this.events = [];
+  this.events = {};
   this.ad = ad;
 
   if (root.tagName !== "TrackingEvents") {
@@ -86,6 +81,17 @@ function TrackingEvents(root, ad) {
 
     this.events[e].push(ev);
   }
+}
+
+/**
+ * Sends a GET request to the given URL
+ *
+ * @param {string} url The URL to request
+ */
+TrackingEvents.prototype.finger = function(url) {
+  var request = new XMLHttpRequest();
+  request.open("get", url, true);
+  request.send();
 }
 
 /**
@@ -157,17 +163,21 @@ TrackingEvents.prototype.track = function(ev, macros) {
     return;
   }
 
-  macros.forEach(function(v, m) {
-    macros["[" + m + "]"] = encodeURIComponent(v);
+  for (var m in macros) {
+    if (!macros.hasOwnProperty(m)) {
+      continue;
+    }
+
+    macros["[" + m + "]"] = encodeURIComponent(macros[m]);
     delete macros[m];
-  });
+  };
 
   // First creative view for a creative within an ad should count as an
   // impression
   if (ev === "creativeView") {
     var ad = this.ad;
     while (ad !== null && !ad.hasSentImpression()) {
-      ad.sentImpression();
+      ad.impressionSent();
       for (var i = 0; i < ad.impressions.length; i++) {
         evs.push({"url": ad.impressions[i]});
       }
@@ -175,18 +185,21 @@ TrackingEvents.prototype.track = function(ev, macros) {
     }
   }
 
+  var that = this;
   evs.forEach(function(e) {
     var url = e["url"];
 
     // Standard dictates 8 digits of randomness
     macros["[CACHEBUSTING]"] = parseInt(Math.random() * 99999999, 10);
 
-    macros.forEach(function(v, m) {
-      url = url.replace(m, v);
-    });
+    for (var m in macros) {
+      if (!macros.hasOwnProperty(m)) {
+        continue;
+      }
+      url = url.replace(m, macros[m]);
+    };
 
-    var img = new Image();
-    img.src = url;
+    that.finger(url);
   });
 };
 
@@ -209,10 +222,8 @@ TrackingEvents.prototype.track = function(ev, macros) {
  *   breakHandler. The first parameter to the function is the corresponding
  *   index in the list passed to the breakHandler, and the second parameter is
  *   the VASTAds object holding the possible ads to play for that break.
- * @param {{width: number, height: number, bitrate: number}} [properties] What
- *   properties the ad player has. Used to determine the best ad to play.
  */
-function VMAP(server, breakHandler, adHandler, properties) {
+function VMAP(server, breakHandler, adHandler) {
   /**
    * List of objects representing an ad break.
    * Each object has the following indices:
@@ -248,7 +259,7 @@ function VMAP(server, breakHandler, adHandler, properties) {
 
       var vast = bn.getElementsByTagNameNS(VMAPNS, 'VASTData');
       if (vast) {
-        adbreak.ad = new VASTAds(vast.item(0).getElementByTagName(null, 'VAST').item(0), targetedAdHandler, properties);
+        adbreak.ad = new VASTAds(vast.item(0).getElementByTagName(null, 'VAST').item(0), targetedAdHandler);
       } else {
         var uri = bn.getElementsByTagNameNS(VMAPNS, 'AdTagURI');
         if (uri) {
@@ -258,7 +269,7 @@ function VMAP(server, breakHandler, adHandler, properties) {
               targetedAdHandler(ad);
             }
           };
-          queryVAST(uri.item(0).textContent.replace(/\s/g, ""), storeAd, properties);
+          queryVAST(uri.item(0).textContent.replace(/\s/g, ""), storeAd);
         } else {
           console.error("No supported ad target for break #" + i);
           continue;
@@ -270,7 +281,7 @@ function VMAP(server, breakHandler, adHandler, properties) {
     }
     breakHandler(breakPositions);
   }, function(e) {
-    console.error("Failed to load VMAP at '" + server + "':", e);
+    console.error("Failed to load VMAP from '" + server + "':", e);
     breakHandler([]);
   });
 }
@@ -305,14 +316,13 @@ VMAP.prototype.onBreakEnd = function(break_index) {
  * @param {string} endpoint The VAST endpoint URL
  * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
  *   null if the request to the endpoint failed
- * @param {{width: number, height: number, bitrate: number}} [properties] What
- *   properties the ad player has. Used to determine the best ad to play.
+ * @param {?VASTAd} parentAd The ad containing the results from this query
  */
-function queryVAST(endpoint, onFetched, properties) {
+function queryVAST(endpoint, onFetched, parentAd) {
   fetchXML(endpoint, null, function(doc) {
-    new VASTAds(doc, onFetched, properties);
+    new VASTAds(doc, onFetched, parentAd);
   }, function (e) {
-    console.error("Failed to load VAST at '" + endpoint + "':", e);
+    console.error("Failed to load VAST from '" + endpoint + "':", e);
     onFetched(null);
   });
 }
@@ -331,16 +341,13 @@ function queryVAST(endpoint, onFetched, properties) {
  *   getBestAd(). Will be passed this VASTAds object. Should be null if no
  *   callback is required. The call to getBestAd() might change over time as
  *   more ads become available.
- * @param {{width: number, height: number, bitrate: number}} [properties] What
- *   properties the ad player has. Used to determine the best ad to play.
  */
-function VASTAds(root, onAdsFetched, properties) {
+function VASTAds(root, onAdsFetched, parentAd) {
   this.ads = [];
   this.onAdsFetched = onAdsFetched;
-  this.properties = properties;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
   for (var i = 0; i < adElements.length; i++) {
-    var ad = new VASTAd(this, adElements.item(i));
+    var ad = new VASTAd(this, adElements.item(i), parentAd || null);
     if (ad.isEmpty()) {
       continue;
     }
@@ -348,8 +355,9 @@ function VASTAds(root, onAdsFetched, properties) {
     this.ads.push(ad);
     if (ad.hasData()) {
       if (onAdsFetched) {
-        this.onAdsFetched.call(this, this);
+        var oaf = this.onAdsFetched;
         this.onAdsFetched = null;
+        oaf.call(this, this);
       }
     } else {
       var that = this;
@@ -366,7 +374,7 @@ function VASTAds(root, onAdsFetched, properties) {
           that.onAdsFetched.call(that, that);
         }
       };
-      queryVAST(uri, onGotFirstAd, properties);
+      queryVAST(uri, onGotFirstAd, ad);
     }
   }
 }
@@ -437,7 +445,7 @@ VASTAds.prototype.getAdWithSequence = function(seq) {
  */
 function VASTAd(vast, root, parentAd, onAdFetched) {
   this.vast = vast;
-  this.pod = pod;
+  this.pod = vast;
   this.parentAd = parentAd;
   this.onAdFetched = onAdFetched;
   this.sequence = null;
@@ -449,13 +457,13 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
   this.nonlinears = [];
   this.impressions = [];
   this.currentPodAd = this;
-  this.hasSentImpression = false;
+  this.sentImpression = false;
 
   /**
    * Copy over tracking and creatives from parent
    */
   var i;
-  if (this.parentAd) {
+  if (this.parentAd !== null) {
     var pa = this.parentAd;
 
     this.companionsRequired = pa.companionsRequired;
@@ -492,6 +500,14 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
     }
   }
 
+  inline = inline.item(0);
+
+  // Extract Impressions
+  var imps = inline.getElementsByTagName("Impression");
+  for (i = 0; i < imps.length; i++) {
+    this.impressions.push(imps.item(i).textContent.replace(/\s/g, ""));
+  }
+
   /**
    * Time to find our creatives.
    * What makes this a lot more ugly that it should be is that we have to merge
@@ -500,7 +516,6 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
    * which elements to merge, so we have to do some heuristics as well.
    * Oh well, here goes...
    */
-  inline = inline.item(0);
   var creatives = inline.getElementsByTagName("Creatives");
   if (creatives.length === 0) {
     return;
@@ -509,11 +524,15 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
   creatives = creatives.item(0).getElementsByTagName("Creative");
 
   for (i = 0; i < creatives.length; i++) {
-    var creative = creatives.item(0).firstChild;
+    var creative = creatives.item(i).firstChild;
 
     // skip TextNodes
     while (creative !== null && creative.nodeType === 3) {
       creative = creative.nextSibling;
+    }
+
+    if (creative === null) {
+      continue;
     }
 
     var n;
@@ -554,9 +573,11 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
           n = new cls(this, items.item(j));
           for (var k = 0; k < arr.length; k++) {
             var o = arr[k];
-            if (( o.attribute('id')     === n.attribute('id')) ||
-               (  o.attribute('width')  === n.attribute('width')
-               && o.attribute('height') === n.attribute('height'))) {
+            if (( o.attribute('id', true)     === n.attribute('id', false)) ||
+               (  o.attribute('width', true)  === n.attribute('width', false)
+               && o.attribute('height', true) === n.attribute('height', false))) {
+              // Fallbacks to true|false there to prevent match when attribute
+              // not present
               o.augment(n);
               n = null;
             }
@@ -595,14 +616,14 @@ VASTAd.prototype.loaded = function(ads, allowPods) {
  * @return {boolean} true if impression metrics have been sent, false otherwise
  */
 VASTAd.prototype.hasSentImpression = function() {
-  return this.hasSentImpression;
+  return this.sentImpression;
 };
 
 /**
  * Indicate that impression metrics have been sent for this ad
  */
-VASTAd.prototype.sentImpression = function() {
-  this.hasSentImpression = true;
+VASTAd.prototype.impressionSent = function() {
+  this.sentImpression = true;
 };
 
 /**
@@ -644,7 +665,7 @@ VASTAd.prototype.hasSequence = function() {
  *   otherwise
  */
 VASTAd.prototype.isEmpty = function() {
-  return this.hasContent;
+  return !this.hasContent;
 };
 
 /**
@@ -804,12 +825,14 @@ VASTCreative.prototype.getClickThrough = function() {
  * of creatives
  *
  * @param {string} name The attribute name
- * @return {?string} The value for that attribute for this creative or null if
- *   unset
+ * @param {*} [nothing] Value to return if attribute isn't present. Defaults to
+ *   null
+ * @return {?string} The value for that attribute for this creative or default
+ *   if unset
  */
-VASTCreative.prototype.attribute = function(name) {
+VASTCreative.prototype.attribute = function(name, nothing) {
   if (!this.root.hasAttribute(name)) {
-    return null;
+    return nothing;
   }
 
   return this.root.getAttribute(name);
@@ -850,12 +873,14 @@ function VASTLinear(ad, root) {
     return;
   }
 
-  medias = media.item(0).getElementsByTagName("MediaFile");
-  for (i = 0; i < media.length; i++) {
+  medias = medias.item(0).getElementsByTagName("MediaFile");
+  for (i = 0; i < medias.length; i++) {
+    var m = medias.item(i);
     var mf = {};
-    for (var attr in medias.item(i).attributes) {
-      mf[attr] = media.item(i).getAttribute(attr);
+    for (var a = 0; a < m.attributes.length; a++) {
+      mf[m.attributes[a].name] = m.attributes[a].value;
     }
+    mf["src"] = medias.item(i).textContent.replace(/\s/g, "");
     this.mediaFiles.push(mf);
   }
 }
@@ -898,6 +923,7 @@ VASTLinear.prototype.augment = function(other) {
  *   - scalable
  *   - maintainAspectRatio
  *   - codec
+ *   - src
  * according to the VAST specification.
  *
  * @return {object[]} a list of media files for this linear
@@ -908,10 +934,10 @@ VASTLinear.prototype.getAllMedias = function() {
 
 /**
  * This methods makes a best guess at what media file to choose for this linear
- * based on canPlay() and the given properties parameter. The properties
- * object should contain the width and height of the video player, as well as a
- * target bitrate if applicable. If no bitrate is given, the highest bitrate is
- * chosen, otherwise the closest bitrate is chosen.
+ * based on canPlay() and the given target parameters. The target object should
+ * contain the width and height of the video player, as well as a target bitrate
+ * if applicable. If no bitrate is given, the highest bitrate is chosen,
+ * otherwise the closest bitrate is chosen.
  *
  * @param {{width: number, height: number, ?bitrate: number}} target The target
  *   video settings
@@ -938,16 +964,16 @@ VASTLinear.prototype.getBestMedia = function(target) {
       // bitrate as the pivot. Has bitrate > closer to target bitrate > highest
       // bitrate
       var other = this.mediaFiles[besti];
-      var otherBR = other.bitrate || other.maxBitrate;
-      var mediaBR = media.bitrate || media.maxBitrate;
+      var otherBR = other["bitrate"] || other["maxBitrate"];
+      var mediaBR = media["bitrate"] || media["maxBitrate"];
 
-      if (otherBR && !mediaBR) {
+      if (mediaBR && !otherBR) {
         besti = i;
-      } else if (bitrate.target && otherBR && mediaBR &&
-                 Math.abs(otherBR - bitrate.target) <
-                 Math.abs(mediaBR - bitrate.target)) {
-        besti = i;
-      } else if (otherBR > mediaBR) {
+      } else if (target["bitrate"] && otherBR && mediaBR) {
+        if (Math.abs(mediaBR - target["bitrate"]) < Math.abs(otherBR - target["bitrate"])) {
+          besti = i;
+        }
+      } else if (mediaBR > otherBR) {
         besti = i;
       }
     }
@@ -1075,12 +1101,12 @@ VASTStatic.prototype.getAllResources = function() {
  */
 VASTStatic.prototype.extractClicks = function(prefix) {
   var el;
-  el = root.getElementsByTagName(prefix + "ClickThrough");
+  el = this.root.getElementsByTagName(prefix + "ClickThrough");
   if (el.length) {
     this.clickThrough = el.item(0).textContent.replace(/\s/g, "");
   }
 
-  el = root.getElementsByTagName(prefix + "ClickTracking");
+  el = this.root.getElementsByTagName(prefix + "ClickTracking");
   if (el.length) {
     this.tracking.addClickTracking(el.item(i).textContent.replace(/\s/g, ""));
   }
