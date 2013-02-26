@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="2.0">
+  <Ad id="602833">
+  <Wrapper>
+    <AdSystem>Acudeo Compatible</AdSystem>
+    <VASTAdTagURI>./test/assets/vast_inline_merge.xml</VASTAdTagURI>
+  <Creatives>
+    <Creative AdID="602833-Companion">
+      <CompanionAds>
+        <Companion width="123" height="456">
+          <StaticResource creativeType="image/jpeg">static-wrapper.jpg</StaticResource>
+          <CompanionClickThrough>http://companion1.wrapper.test.com</CompanionClickThrough>
+        </Companion>
+        <Companion width="200" height="200">
+          <StaticResource creativeType="image/jpeg">static-size.jpg</StaticResource>
+          <CompanionClickThrough>http://companion-size.wrapper.test.com</CompanionClickThrough>
+        </Companion>
+        <Companion id="merge">
+          <StaticResource creativeType="image/jpeg">static-id.jpg</StaticResource>
+          <CompanionClickThrough>http://companion-id.wrapper.test.com</CompanionClickThrough>
+        </Companion>
+      </CompanionAds>
+    </Creative>
+  </Creatives>
+  </Wrapper>
+  </Ad>
+</VAST>

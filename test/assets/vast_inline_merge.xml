@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="2.0">
+  <Ad id="602833">
+  <InLine>
+    <AdSystem>Acudeo Compatible</AdSystem>
+  <Creatives>
+    <Creative AdID="602833-Companion">
+      <CompanionAds>
+        <Companion width="456" height="123">
+          <StaticResource creativeType="image/jpeg">static-inline.jpg</StaticResource>
+          <CompanionClickThrough>http://companion1.inline.test.com</CompanionClickThrough>
+        </Companion>
+        <Companion width="200" height="200">
+          <IFrameResource>/inline-size</IFrameResource>
+          <CompanionClickThrough>http://companion-size.inline.test.com</CompanionClickThrough>
+        </Companion>
+        <Companion id="merge">
+          <IFrameResource>/inline-id</IFrameResource>
+          <CompanionClickThrough>http://companion-id.inline.test.com</CompanionClickThrough>
+        </Companion>
+      </CompanionAds>
+    </Creative>
+  </Creatives>
+  </InLine>
+  </Ad>
+</VAST>

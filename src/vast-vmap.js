@@ -648,6 +648,7 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
               // again.
               o.augment(n);
               n = null;
+              break;
             }
           }
 
@@ -1157,6 +1158,19 @@ function VASTStatic(ad, root) {
 VASTStatic.prototype = Object.create(VASTCreative.prototype);
 
 /**
+ * Adds the tracking events and creative elements found in the given
+ * VASTCompanion record to those currently in this creative
+ *
+ * @param {VASTCompanion} other VASTCompanion object to merge into this one
+ */
+VASTStatic.prototype.augment = function(other) {
+  this.tracking.augment(other.tracking);
+  this.clickThrough = other.clickThrough || this.clickThrough;
+  this.resources["iframe"] = other.resources["iframe"] || this.resources["iframe"];
+  this.resources["html"] = other.resources["html"] || this.resources["html"];
+};
+
+/**
  * Returns all resources associated with this creative.
  *
  * @return {{?iframe: string, ?html: string, ?images}} an object representing
@@ -1224,8 +1238,7 @@ VASTCompanion.prototype.copy = function(ad) {
  * @param {VASTCompanion} other VASTCompanion object to merge into this one
  */
 VASTCompanion.prototype.augment = function(other) {
-  this.tracking.augment(other.tracking);
-  this.clickThrough = other.clickThrough || this.clickThrough;
+  VASTStatic.prototype.augment.call(this, other);
   this.altText = other.altText || this.altText;
 };
 
@@ -1262,8 +1275,7 @@ VASTNonLinear.prototype = Object.create(VASTStatic.prototype);
  * @param {VASTNonLinear} other VASTNonLinear object to merge into this one
  */
 VASTNonLinear.prototype.augment = function(other) {
-  this.tracking.augment(other.tracking);
-  this.clickThrough = other.clickThrough || this.clickThrough;
+  VASTStatic.prototype.augment.call(this, other);
 };
 
 /**
