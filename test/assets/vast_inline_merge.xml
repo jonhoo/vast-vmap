@@ -16,6 +16,8 @@
         </Companion>
         <Companion id="merge">
           <IFrameResource>/inline-id</IFrameResource>
+          <StaticResource creativeType="image/gif">static-inline.gif</StaticResource>
+          <StaticResource creativeType="image/png">static-inline.png</StaticResource>
           <CompanionClickThrough>http://companion-id.inline.test.com</CompanionClickThrough>
         </Companion>
       </CompanionAds>

@@ -67,6 +67,21 @@ buster.testCase("Single wrapped ad Ads merge", {
     }
   },
 
+  "merges companion image resources": function() {
+    for (var i = 0; i < this.ad.companions.length; i++) {
+      var c = this.ad.companions[i];
+      if (c.attribute('id') === 'merge') {
+        assert.match(c.getAllResources(), {
+          "images": {
+            "image/jpeg": "static-id.jpg",
+            "image/png": "static-inline.png",
+            "image/gif": "static-inline.gif"
+          },
+        });
+      }
+    }
+  },
+
   "merges companion resources by size": function() {
     for (var i = 0; i < this.ad.companions.length; i++) {
       var c = this.ad.companions[i];

@@ -1193,6 +1193,11 @@ VASTStatic.prototype.augment = function(other) {
   this.clickThrough = other.clickThrough || this.clickThrough;
   this.resources["iframe"] = other.resources["iframe"] || this.resources["iframe"];
   this.resources["html"] = other.resources["html"] || this.resources["html"];
+  for (var t in other.resources["images"]) {
+    if (other.resources["images"].hasOwnProperty(t)) {
+      this.resources["images"][t] = other.resources["images"][t];
+    }
+  }
 };
 
 /**

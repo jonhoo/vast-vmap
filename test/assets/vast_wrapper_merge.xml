@@ -17,6 +17,7 @@
         </Companion>
         <Companion id="merge">
           <StaticResource creativeType="image/jpeg">static-id.jpg</StaticResource>
+          <StaticResource creativeType="image/png">static-override.png</StaticResource>
           <CompanionClickThrough>http://companion-id.wrapper.test.com</CompanionClickThrough>
         </Companion>
         <Companion width="456" height="123" id="dontmerge-2">
