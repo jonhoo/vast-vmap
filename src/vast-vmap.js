@@ -384,17 +384,15 @@ function queryVAST(endpoint, onFetched, parentAd) {
  *
  * @constructor
  * @param {Element} root The root node of the VAST XML response
- * @param {function(?VASTAds)} onAdsFetched The function to call when at least
+ * @param {function(?VASTAds)} onAdsAvailable The function to call when at least
  *   one ad is available. When this function is called, it is safe to call
  *   getBestAd(). Will be passed this VASTAds object. Should be null if no
  *   callback is required. The call to getBestAd() might change over time as
  *   more ads become available.
- *
- * TODO: onAdsFetched -> onAdsAvailable
  */
-function VASTAds(root, onAdsFetched, parentAd) {
+function VASTAds(root, onAdsAvailable, parentAd) {
   this.ads = [];
-  this.onAdsFetched = onAdsFetched;
+  this.onAdsAvailable = onAdsAvailable;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
@@ -405,9 +403,11 @@ function VASTAds(root, onAdsFetched, parentAd) {
 
     this.ads.push(ad);
     if (ad.hasData()) {
-      if (onAdsFetched) {
-        var oaf = this.onAdsFetched;
-        this.onAdsFetched = null;
+      if (onAdsAvailable) {
+        // Needs to be reset before calling user function since user function
+        // may take long to execute
+        var oaf = this.onAdsAvailable;
+        this.onAdsAvailable = null;
         oaf.call(this, this);
       }
     } else {
@@ -424,8 +424,10 @@ function VASTAds(root, onAdsFetched, parentAd) {
 
       var onGotFirstAd = function(ads) {
         ad.onLoaded(ads, allowPods);
-        if (that.onAdsFetched) {
-          that.onAdsFetched.call(that, that);
+        if (that.onAdsAvailable) {
+          var oaf = that.onAdsAvailable;
+          that.onAdsAvailable = null;
+          oaf.call(that, that);
         }
       };
       queryVAST(uri, onGotFirstAd, ad);
@@ -493,15 +495,15 @@ VASTAds.prototype.getAdWithSequence = function(seq) {
  * @constructor
  * @param {VASTAds} vast Parent VAST record
  * @param {Element} root The root node of this <Ad> in the VAST XML response
- * @param {function} onAdFetched The function to call when the ad has been fully
- *   fetched and parsed. Until this function is called, other methods on this
- *   object may return incomplete or inconsistent results.
+ * @param {function} onAdAvailable The function to call when the ad has been
+ *   fully fetched and parsed. Until this function is called, other methods on
+ *   this object may return incomplete or inconsistent results.
  */
-function VASTAd(vast, root, parentAd, onAdFetched) {
+function VASTAd(vast, root, parentAd, onAdAvailable) {
   this.vast = vast;
   this.pod = vast;
   this.parentAd = parentAd;
-  this.onAdFetched = onAdFetched;
+  this.onAdAvailable = onAdAvailable;
   this.sequence = null;
   this.hasContent = true;
   this.loaded = true;
@@ -686,8 +688,8 @@ VASTAd.prototype.onLoaded = function(ads, allowPods) {
 
   if (!this.currentPodAd.isEmpty()) {
     this.loaded = true;
-    if (this.onAdFetched) {
-      this.onAdFetched.call(this, this);
+    if (this.onAdAvailable) {
+      this.onAdAvailable.call(this, this);
     }
   }
 };
