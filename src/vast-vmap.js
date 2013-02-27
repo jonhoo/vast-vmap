@@ -1051,8 +1051,6 @@ VASTLinear.prototype.getAllMedias = function() {
  * applicable. If no bitrate is given, the highest bitrate is chosen, otherwise
  * the closest bitrate is chosen.
  *
- * TODO: Optionally check canPlay (perhaps take function in target?)
- *
  * @param {{width: number, height: number, ?bitrate: number}} target The target
  *   video settings
  * @return {?object} a single media file with the properties given for each
