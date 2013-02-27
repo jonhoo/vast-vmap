@@ -492,6 +492,10 @@ VASTAds.prototype.getAdWithSequence = function(seq) {
  *
  * Beware, beyond lies dragons and pits of fire.
  *
+ * TODO: Add interface for reporting errors, possibly also "rejecting" the ad
+ * TODO: Add interface for getting ad properties like AdSystem
+ * TODO: Add support for <Icons> as dictated by the standard
+ *
  * @constructor
  * @param {VASTAds} vast Parent VAST record
  * @param {Element} root The root node of this <Ad> in the VAST XML response
@@ -509,6 +513,9 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
   this.loaded = true;
   this.linear = null;
   this.companions = [];
+  // TODO: Enforce the companions required attribute
+  // Can that even be done here, or must it be done by interface?
+  // Must give interface a way of "rejecting" an ad?
   this.companionsRequired = "none";
   this.nonlinears = [];
   this.nonlinearsTracking = null;
@@ -933,6 +940,7 @@ VASTCreative.prototype.getClickThrough = function() {
  *   if unset
  */
 VASTCreative.prototype.attribute = function(name, nothing) {
+  // TODO: attributes should be merged when augmented
   if (!this.root.hasAttribute(name)) {
     return nothing;
   }
@@ -943,6 +951,8 @@ VASTCreative.prototype.attribute = function(name, nothing) {
 /**
  * Parses the VAST creative element at the given root node and returns an object
  * representing that linear creative
+ *
+ * TODO: better support for skipOffset attribute
  *
  * @constructor
  * @extends VASTCreative
@@ -1036,10 +1046,12 @@ VASTLinear.prototype.getAllMedias = function() {
 
 /**
  * This methods makes a best guess at what media file to choose for this linear
- * based on canPlay() and the given target parameters. The target object should
- * contain the width and height of the video player, as well as a target bitrate
- * if applicable. If no bitrate is given, the highest bitrate is chosen,
- * otherwise the closest bitrate is chosen.
+ * based on the given target parameters. The target object should contain the
+ * width and height of the video player, as well as a target bitrate if
+ * applicable. If no bitrate is given, the highest bitrate is chosen, otherwise
+ * the closest bitrate is chosen.
+ *
+ * TODO: Optionally check canPlay (perhaps take function in target?)
  *
  * @param {{width: number, height: number, ?bitrate: number}} target The target
  *   video settings
@@ -1153,6 +1165,8 @@ VASTLinear.prototype.getTrackingPoints = function() {
 
 /**
  * A base class for static (Companion or NonLinear) VAST Creative elements
+ *
+ * TODO: Add support for getting adParameters
  *
  * @param {VASTAd} ad The ad holding this creative
  * @param {Element} root The root node of this creative in the VAST XML
