@@ -1,7 +1,6 @@
 buster.testCase("Single wrapped ad", {
   prepare: function(done) {
     var that = this;
-    this.timeout = 500;
     queryVAST("./test/assets/vast_wrapper_linear_1.xml", function(ads) {
       that.vast = ads;
       done();

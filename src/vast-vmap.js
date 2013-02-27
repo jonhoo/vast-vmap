@@ -223,7 +223,11 @@ TrackingEvents.prototype.track = function(ev, macros) {
     var url = e["url"];
 
     // Standard dictates 8 digits of randomness
-    macros["[CACHEBUSTING]"] = parseInt(Math.random() * 99999999, 10);
+    var rand = '' + parseInt(Math.random() * 99999999, 10);
+    while (rand.length !== 8) {
+      rand = '0' + rand;
+    }
+    macros["[CACHEBUSTING]"] = rand;
 
     for (m in macros) {
       if (!macros.hasOwnProperty(m)) {
