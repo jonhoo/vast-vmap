@@ -19,6 +19,10 @@
           <StaticResource creativeType="image/jpeg">static-id.jpg</StaticResource>
           <CompanionClickThrough>http://companion-id.wrapper.test.com</CompanionClickThrough>
         </Companion>
+        <Companion width="456" height="123" id="dontmerge-2">
+          <StaticResource creativeType="image/jpeg">static-dontmerge-2.jpg</StaticResource>
+          <CompanionClickThrough>http://companion-dontmerge-2.wrapper.test.com</CompanionClickThrough>
+        </Companion>
       </CompanionAds>
     </Creative>
   </Creatives>

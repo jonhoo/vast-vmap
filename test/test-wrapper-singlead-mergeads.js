@@ -13,7 +13,7 @@ buster.testCase("Single wrapped ad Ads merge", {
   },
 
   "merges companions correctly": function() {
-    assert.equals(this.ad.companions.length, 4);
+    assert.equals(this.ad.companions.length, 5);
   },
 
   "prefers inline companion clickthrough by id": function() {
@@ -23,6 +23,27 @@ buster.testCase("Single wrapped ad Ads merge", {
         assert.equals(c.getClickThrough(), "http://companion-id.inline.test.com");
       }
     }
+  },
+
+  "doesn't merge companions with same res, different id": function() {
+    var found = 0;
+    for (var i = 0; i < this.ad.companions.length; i++) {
+      var c = this.ad.companions[i];
+      if (c.attribute('id') === 'dontmerge-1') {
+        assert.match(c.getAllResources(), {
+          "images": { "image/jpeg": "static-dontmerge-1.jpg" }
+        });
+        found++;
+      }
+      if (c.attribute('id') === 'dontmerge-2') {
+        assert.match(c.getAllResources(), {
+          "images": { "image/jpeg": "static-dontmerge-2.jpg" }
+        });
+        found++;
+      }
+    }
+
+    assert.equals(found, 2, "companions were merged");
   },
 
   "merges companion resources by id": function() {

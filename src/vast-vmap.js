@@ -644,13 +644,21 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
 
           for (var k = 0; k < arrl; k++) {
             var o = arr[k];
-            if (( o.attribute('id', true)     === n.attribute('id', false)) ||
-               (  o.attribute('width', true)  === n.attribute('width', false)
-               && o.attribute('height', true) === n.attribute('height', false))) {
-              // Fallbacks to true|false there to prevent match when attribute
-              // not present. If we do this merge then the n is basically a copy
-              // of o, which is already in the array, so we don't want to add it
-              // again.
+
+            // Match if two values are equal or only one is set
+            var m1 = o.attribute('id', n.attribute('id')) === n.attribute('id', o.attribute('id'));
+            var m2 = o.attribute('width', n.attribute('width')) === n.attribute('width', o.attribute('width'));
+            var m3 = o.attribute('height', n.attribute('height')) === n.attribute('height', o.attribute('height'));
+
+            // Set if both values are set
+            var idset = o.attribute('id') !== undefined && n.attribute('id') !== undefined;
+            var widthset = o.attribute('width') !== undefined && n.attribute('width') !== undefined;
+            var heightset = o.attribute('height') !== undefined && n.attribute('height') !== undefined;
+
+            // If all match and at least one set for both
+            if (m1 && m2 && m3 && (idset || widthset || heightset)) {
+              // If we do this merge then the n is basically a copy of o, which
+              // is already in the array, so we don't want to add it again.
               o.augment(n);
               n = null;
               break;
@@ -918,7 +926,7 @@ VASTCreative.prototype.getClickThrough = function() {
  *
  * @param {string} name The attribute name
  * @param {*} [nothing] Value to return if attribute isn't present. Defaults to
- *   null
+ *   undefined
  * @return {?string} The value for that attribute for this creative or default
  *   if unset
  */

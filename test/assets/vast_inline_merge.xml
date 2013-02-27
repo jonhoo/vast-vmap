@@ -6,9 +6,9 @@
   <Creatives>
     <Creative AdID="602833-Companion">
       <CompanionAds>
-        <Companion width="456" height="123">
-          <StaticResource creativeType="image/jpeg">static-inline.jpg</StaticResource>
-          <CompanionClickThrough>http://companion1.inline.test.com</CompanionClickThrough>
+        <Companion width="456" height="123" id="dontmerge-1">
+          <StaticResource creativeType="image/jpeg">static-dontmerge-1.jpg</StaticResource>
+          <CompanionClickThrough>http://companion-dontmerge-1.inline.test.com</CompanionClickThrough>
         </Companion>
         <Companion width="200" height="200">
           <IFrameResource>/inline-size</IFrameResource>
