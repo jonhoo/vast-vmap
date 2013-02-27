@@ -878,9 +878,23 @@ function VASTCreative(ad, root) {
  */
 VASTCreative.prototype.track = function(ev, position, asset) {
   this.tracking.track(ev, {
-    "CONTENTPLAYHEAD": position,
+    "CONTENTPLAYHEAD": this.timecodeToString(position),
     "ASSETURI": asset
   });
+};
+
+VASTCreative.prototype.timecodeToString = function(time) {
+  var hrs = '0' + parseInt(time/3600);
+  var mts = '0' + parseInt((time % 3600)/60);
+  var scs = '0' + time % 60;
+  var str = hrs + ':' + mts + ':' + scs;
+  return str.replace(/(^|:|\.)0(\d{2})/g, "\1\2");
+};
+
+VASTCreative.prototype.timecodeFromString = function(time) {
+  return parseInt(time.substr(0,2), 10) * 3600
+       + parseInt(time.substr(3,2), 10) * 60
+       + parseInt(time.substr(6,2), 10);
 };
 
 /**
@@ -1113,9 +1127,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
         }
 
         if (offset.indexOf(':') > -1) {
-          offset = parseInt(offset.substr(0,2), 10) * 3600
-                 + parseInt(offset.substr(3,2), 10) * 60
-                 + parseInt(offset.substr(6,2), 10);
+          offset = VASTCreative.prototype.timecodeFromString(offset);
         }
         point["offset"] = offset;
     }

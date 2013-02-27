@@ -18,6 +18,7 @@
           <Tracking event="firstQuartile">/firstQuartile</Tracking>
           <Tracking event="thirdQuartile">/thirdQuartile</Tracking>
           <Tracking event="complete">/complete</Tracking>
+          <Tracking event="fullscreen">/fullscreen/[CONTENTPLAYHEAD]/[ASSETURI]/[CACHEBUSTING]</Tracking>
           <Tracking event="progress" offset="01:01:01">/progabs</Tracking>
           <Tracking event="progress" offset="10%">/progrel</Tracking>
           <Tracking event="progress" offset="start">/progrel</Tracking>

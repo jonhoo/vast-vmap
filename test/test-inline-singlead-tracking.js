@@ -148,4 +148,9 @@ buster.testCase("Single inline ad tracking", {
     }
   },
 
+  "expands macros and URI encode": function() {
+    this.ad.linear.track("fullscreen", 3661, "ad.mp4");
+    assert.match(this.server.requests[0].url, /^\/fullscreen\/01%3A01%3A01\/ad.mp4\/\d{8}$/);
+  },
+
 })
