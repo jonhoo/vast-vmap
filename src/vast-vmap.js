@@ -34,7 +34,7 @@ var fetchXML = function(url, identifier, onSuccess, onFailure) {
 
   request.open("GET", url, true);
   request.send(null);
-}
+};
 
 /**
  * Extracts tracking events from the given XML fragment
@@ -114,7 +114,7 @@ TrackingEvents.prototype.finger = function(url) {
   var request = new XMLHttpRequest();
   request.open("get", url, true);
   request.send();
-}
+};
 
 /**
  * Adds the tracking events found in the given TrackingEvents object to this one
@@ -132,7 +132,7 @@ TrackingEvents.prototype.augment = function(other) {
     } else {
       this.events[e] = this.events[e].concat(other.events[e]);
     }
-  };
+  }
 };
 
 /**
@@ -176,7 +176,7 @@ TrackingEvents.prototype.getEventsOfTypes = function(evts) {
     if (evts.indexOf(e) > -1 || (includeProgress && e.indexOf("progress-") === 0)) {
       ret = ret.concat(this.events[e]);
     }
-  };
+  }
 
   return ret;
 };
@@ -193,6 +193,7 @@ TrackingEvents.prototype.track = function(ev, macros) {
   }
 
   var evs = [].concat(this.events[ev]);
+  var i;
 
   for (var m in macros) {
     if (!macros.hasOwnProperty(m)) {
@@ -201,7 +202,7 @@ TrackingEvents.prototype.track = function(ev, macros) {
 
     macros["[" + m + "]"] = encodeURIComponent(macros[m]);
     delete macros[m];
-  };
+  }
 
   // First creative view for a creative within an ad should count as an
   // impression
@@ -209,7 +210,7 @@ TrackingEvents.prototype.track = function(ev, macros) {
     var ad = this.ad;
     while (ad !== null && !ad.hasSentImpression()) {
       ad.impressionSent();
-      for (var i = 0; i < ad.impressions.length; i++) {
+      for (i = 0; i < ad.impressions.length; i++) {
         evs.push({"url": ad.impressions[i]});
       }
       ad = ad.parentAd;
@@ -217,22 +218,22 @@ TrackingEvents.prototype.track = function(ev, macros) {
   }
 
   var that = this;
-  for (var i = 0; i < evs.length; i++) {
+  for (i = 0; i < evs.length; i++) {
     var e = evs[i];
     var url = e["url"];
 
     // Standard dictates 8 digits of randomness
     macros["[CACHEBUSTING]"] = parseInt(Math.random() * 99999999, 10);
 
-    for (var m in macros) {
+    for (m in macros) {
       if (!macros.hasOwnProperty(m)) {
         continue;
       }
       url = url.replace(m, macros[m]);
-    };
+    }
 
     that.finger(url);
-  };
+  }
 };
 
 /**
@@ -618,7 +619,7 @@ function VASTAd(vast, root, parentAd, onAdFetched) {
         if (creative.hasAttribute("required")) {
           this.companionsRequired = creative.getAttribute("required");
         }
-        // fallthrough
+        /* falls through */
       case "NonLinearAds":
         var tag = creative.tagName.replace("Ads", "");
         var cls = tag === "Companion" ? VASTCompanion : VASTNonLinear;
