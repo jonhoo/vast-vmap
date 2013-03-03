@@ -2,7 +2,8 @@
 <VAST version="2.0">
   <Ad id="602833">
   <InLine>
-    <AdSystem>Acudeo Compatible</AdSystem>
+    <AdTitle>VAST 2.0 Instream Test 1</AdTitle>
+    <Description>VAST 2.0 Instream Test 1</Description>
   <Creatives>
     <Creative AdID="602833-Companion">
       <CompanionAds>

@@ -94,4 +94,10 @@ buster.testCase("Single wrapped ad Ads merge", {
     }
   },
 
+  "merges ad tags": function() {
+    assert.equals(this.ad.getTag('AdSystem'), "Acudeo Compatible");
+    assert.equals(this.ad.getTag('AdTitle'), "VAST 2.0 Instream Test 1");
+    assert.equals(this.ad.getTag('Description'), "VAST 2.0 Instream Test 1");
+  },
+
 })

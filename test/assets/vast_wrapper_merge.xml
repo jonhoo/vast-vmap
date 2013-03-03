@@ -3,6 +3,7 @@
   <Ad id="602833">
   <Wrapper>
     <AdSystem>Acudeo Compatible</AdSystem>
+    <AdTitle>Should be overridden</AdTitle>
     <VASTAdTagURI>./test/assets/vast_inline_merge.xml</VASTAdTagURI>
   <Creatives>
     <Creative AdID="602833-Companion">

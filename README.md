@@ -56,7 +56,6 @@ just haven't gotten around to them yet.
   - Enforcement of the "required" attribute for Companion Ads
   - An interface for reporting errors so that they are reported back to
     the Ad Server
-  - Getters for various tags (Description, Advertiser, Duration, etc.).
   - adParameters for Flash StaticResources
   - Industry Icons (which are **required** according to the standard).
     This is simply because I haven't gotten around to it yet. Also,

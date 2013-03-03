@@ -24,4 +24,14 @@ buster.testCase("Single inline ad", {
     assert.equals(this.ad.linear.clickThrough, "http://linear.test.com");
   },
 
+  "finds linear duration": function() {
+    assert.equals(this.ad.linear.getDuration(), 3661);
+  },
+
+  "finds ad tags": function() {
+    assert.equals(this.ad.getTag('AdSystem'), "Acudeo Compatible");
+    assert.equals(this.ad.getTag('AdTitle'), "VAST 2.0 Instream Test 1");
+    assert.equals(this.ad.getTag('Description'), "VAST 2.0 Instream Test 1");
+  },
+
 })

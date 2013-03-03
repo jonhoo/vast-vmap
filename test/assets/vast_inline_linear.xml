@@ -10,7 +10,7 @@
   <Creatives>
     <Creative AdID="601364">
       <Linear>
-        <Duration>00:00:30</Duration>
+        <Duration>01:01:01</Duration>
         <TrackingEvents>
           <Tracking event="creativeView">/creativeView</Tracking>
           <Tracking event="start">/start</Tracking>

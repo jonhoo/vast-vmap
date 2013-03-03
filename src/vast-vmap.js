@@ -521,6 +521,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
   this.impressions = [];
   this.currentPodAd = this;
   this.sentImpression = false;
+  this.properties = {};
 
   /**
    * Copy over tracking and creatives from parent
@@ -547,6 +548,12 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
     if (pa.nonlinearsTracking !== null) {
       this.nonlinearsTracking = pa.nonlinearsTracking.copy(this);
     }
+
+    for (var k in pa.properties) {
+      if (pa.properties.hasOwnProperty(k)) {
+        this.properties[k] = pa.properties[k];
+      }
+    }
   }
 
   if (this.nonlinearsTracking === null) {
@@ -571,6 +578,24 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
   }
 
   inline = inline.item(0);
+
+  var prop = inline.firstChild;
+  while (prop !== null) {
+    if (prop.nodeType === 1) {
+      switch (prop.tagName) {
+        case 'Creatives':
+        case 'InLine':
+        case 'Wrapper':
+        case 'Impression':
+        case 'VASTAdTagURI':
+        case 'Error':
+          break;
+        default:
+          this.properties[prop.tagName] = prop.textContent.replace(/^\s*|\s*$/g, "");
+      }
+    }
+    prop = prop.nextSibling;
+  }
 
   // Extract Impressions
   var imps = inline.getElementsByTagName("Impression");
@@ -681,6 +706,25 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
     }
   }
 }
+
+/**
+ * Returns the value of the given tag for this ad
+ *
+ * See the VAST spec for what tags may be present on an ad
+ * Note that ad tags are merged from the parent
+ *
+ * @param {string} tag The attribute to get
+ * @param {*} [nothing] Value to return if tag isn't present. Defaults to
+ *   undefined
+ * @return {?string} The value for that tag for this ad or default if unset
+ */
+VASTAd.prototype.getTag = function(tag, nothing) {
+  if (!this.properties.hasOwnProperty(tag)) {
+    return nothing;
+  }
+
+  return this.properties[tag];
+};
 
 /**
  * Should be called the VAST response matching this wrapped ad is parsed and
@@ -962,6 +1006,7 @@ function VASTLinear(ad, root) {
   VASTCreative.call(this, ad, root);
   this.mediaFiles = [];
   this.clickThrough = null;
+  this.duration = null;
 
   var i;
 
@@ -977,6 +1022,11 @@ function VASTLinear(ad, root) {
     for (i = 0; i < ct.length; i++) {
       this.tracking.addClickTracking(ct.item(i).textContent.replace(/\s/g, ""));
     }
+  }
+
+  var d = root.getElementsByTagName("Duration");
+  if (d.length) {
+    this.duration = this.timecodeFromString(d.item(0).textContent.replace(/\s/g, ""));
   }
 
   var medias = root.getElementsByTagName("MediaFiles");
@@ -997,6 +1047,15 @@ function VASTLinear(ad, root) {
 }
 
 VASTLinear.prototype = Object.create(VASTCreative.prototype);
+
+/**
+ * Returns the duration for this linear creative, or null if not set
+ *
+ * @return {?number} The duration of this linear in seconds, null otherwise
+ */
+VASTLinear.prototype.getDuration = function() {
+  return this.duration;
+}
 
 /**
  * Returns a new, but identical VASTLinear object pointing to the given ad
