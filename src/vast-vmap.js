@@ -396,13 +396,12 @@ function VASTAds(root, onAdsAvailable, parentAd) {
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
-    // TODO: needs to check current() and hasSequence()
     if (ad.isEmpty()) {
       continue;
     }
 
     this.ads.push(ad);
-    if (ad.hasData()) {
+    if (ad.hasData() && (!ad.hasSequence() || ad.isNumber(1))) {
       if (onAdsAvailable) {
         // Needs to be reset before calling user function since user function
         // may take long to execute
