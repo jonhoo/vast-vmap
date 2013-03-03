@@ -890,6 +890,8 @@ VASTAd.prototype.getNonLinears = function() {
 /**
  * A base class for VAST Creative elements
  *
+ * TODO: Add support for getting adParameters
+ *
  * @param {VASTAd} ad The ad holding this creative
  * @param {Element} root The root node of this creative in the VAST XML
  * @constructor
@@ -1221,8 +1223,6 @@ VASTLinear.prototype.getTrackingPoints = function() {
 
 /**
  * A base class for static (Companion or NonLinear) VAST Creative elements
- *
- * TODO: Add support for getting adParameters
  *
  * @param {VASTAd} ad The ad holding this creative
  * @param {Element} root The root node of this creative in the VAST XML
