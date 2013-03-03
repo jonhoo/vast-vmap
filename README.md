@@ -50,9 +50,6 @@ out mostly intentionally:
 The following is a list of features that I do want to implement, but I
 just haven't gotten around to them yet.
 
-  - Explicit skipOffset support for Linears (you *can* get it with
-    `VASTLinear#attribute`, but there should be a better interface for
-    it)
   - Enforcement of the "required" attribute for Companion Ads
   - An interface for reporting errors so that they are reported back to
     the Ad Server

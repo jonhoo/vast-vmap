@@ -949,6 +949,12 @@ VASTCreative.prototype.track = function(ev, position, asset) {
   });
 };
 
+/**
+ * Takes a timestamp and returns it as a timecode string HH:MM:SS
+ *
+ * @param {number} time Timestamp in seconds
+ * @return {string} Timestamp as timecode
+ */
 VASTCreative.prototype.timecodeToString = function(time) {
   var hrs = '0' + parseInt(time/3600);
   var mts = '0' + parseInt((time % 3600)/60);
@@ -957,7 +963,18 @@ VASTCreative.prototype.timecodeToString = function(time) {
   return str.replace(/(^|:|\.)0(\d{2})/g, "\1\2");
 };
 
+/**
+ * Takes a string and returns it as a number of seconds if it is a timecode,
+ * otherwise just returns the string (XX% for example)
+ *
+ * @param {string} time Timecode
+ * @returns {number|string} Timecode in seconds or input string
+ */
 VASTCreative.prototype.timecodeFromString = function(time) {
+  if (time.indexOf(':') === -1) {
+    return time;
+  }
+
   return parseInt(time.substr(0,2), 10) * 3600
        + parseInt(time.substr(3,2), 10) * 60
        + parseInt(time.substr(6,2), 10);
@@ -978,6 +995,8 @@ VASTCreative.prototype.getClickThrough = function() {
  * See the VAST spec for what attributes may be present on the different types
  * of creatives
  *
+ * Handles any timecode attribute as a timecode and converts it to a number
+ *
  * @param {string} name The attribute name
  * @param {*} [nothing] Value to return if attribute isn't present. Defaults to
  *   undefined
@@ -990,14 +1009,20 @@ VASTCreative.prototype.attribute = function(name, nothing) {
     return nothing;
   }
 
-  return this.root.getAttribute(name);
+  var attr = this.root.getAttribute(name);
+  switch (name) {
+    case 'skipoffset':
+    case 'duration':
+    case 'offset':
+    case 'minSuggestedDuration':
+      attr = this.timecodeFromString(attr);
+  }
+  return attr;
 };
 
 /**
  * Parses the VAST creative element at the given root node and returns an object
  * representing that linear creative
- *
- * TODO: better support for skipOffset attribute
  *
  * @constructor
  * @extends VASTCreative
@@ -1210,10 +1235,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
           continue;
         }
 
-        if (offset.indexOf(':') > -1) {
-          offset = VASTCreative.prototype.timecodeFromString(offset);
-        }
-        point["offset"] = offset;
+        point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
     }
     points.push(point);
   }

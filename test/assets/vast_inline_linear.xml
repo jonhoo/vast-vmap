@@ -9,7 +9,7 @@
     <Impression>/impression</Impression>
   <Creatives>
     <Creative AdID="601364">
-      <Linear>
+      <Linear skipoffset="02:02:02">
         <Duration>01:01:01</Duration>
         <TrackingEvents>
           <Tracking event="creativeView">/creativeView</Tracking>
