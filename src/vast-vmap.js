@@ -1,7 +1,14 @@
+/* jshint loopfunc:true,sub:true */
+
 /**
  * @const
  */
 var VMAPNS = "http://www.iab.net/vmap-1.0";
+
+/**
+ * exports
+ */
+var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
 
 /**
  * Asynchronously fetches the given URL, parses the returned content as XML and
@@ -16,7 +23,7 @@ var VMAPNS = "http://www.iab.net/vmap-1.0";
  *   object if the response was not parsed as XML. The second parameter is the
  *   identifier.
  */
-var fetchXML = function(url, identifier, onSuccess, onFailure) {
+function fetchXML(url, identifier, onSuccess, onFailure) {
   var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (request.readyState === 4) {
@@ -34,7 +41,36 @@ var fetchXML = function(url, identifier, onSuccess, onFailure) {
 
   request.open("GET", url, true);
   request.send(null);
-};
+}
+
+/**
+ * Queries the given VAST endpoint for ads and calls the given function when the
+ * ads have been loaded, giving the corresponding VASTAds object
+ *
+ * @param {string} endpoint The VAST endpoint URL
+ * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
+ *   null if the request to the endpoint failed
+ * @param {?VASTAd} parentAd The ad containing the results from this query
+ */
+function queryVAST(endpoint, onFetched, parentAd) {
+  fetchXML(endpoint, null, function(doc) {
+    try {
+      new VASTAds(doc, onFetched, parentAd);
+    } catch(e) {
+      console.error(e.toString());
+      var s = e.stack.split(/\n/);
+      for (var i = 0; i < s.length; i++) {
+        var msg = s[i];
+        msg = msg.replace("[arguments not available]", "");
+        msg = msg.replace(/http:\/\/.*?resources\//, "");
+        console.debug("\t" + msg);
+      }
+    }
+  }, function (e) {
+    console.error("Failed to load VAST from '" + endpoint + "':", e);
+    onFetched(null);
+  });
+}
 
 /**
  * Extracts tracking events from the given XML fragment
@@ -69,7 +105,7 @@ function TrackingEvents(root, ad) {
       continue;
     }
 
-    offset = null;
+    var offset = null;
     if (e === "progress") {
       offset = tracks[i].getAttribute("offset");
       e += "-" + offset;
@@ -253,10 +289,10 @@ TrackingEvents.prototype.track = function(ev, macros) {
  *   position can either be a percentage (<1), a number of seconds into the
  *   content video or one of the string literals "start" or "end". Ordinal
  *   positions are not supported and thus will not be passed.
- * @param {function(number, VASTAds)} adHandler The function to call whenever
- *   the VAST ad response for an ad break has been fetched and/or parsed. This
- *   function will be called at most once for every ad break given to
- *   breakHandler. The first parameter to the function is the corresponding
+ * @param {function(number, string, VASTAds)} adHandler The function to call
+ *   whenever the VAST ad response for an ad break has been fetched and/or
+ *   parsed. This function will be called at most once for every ad break given
+ *   to breakHandler. The first parameter to the function is the corresponding
  *   index in the list passed to the breakHandler, and the second parameter is
  *   the VASTAds object holding the possible ads to play for that break.
  */
@@ -288,24 +324,29 @@ function VMAP(server, breakHandler, adHandler) {
       var adbreak = {
         ad: null,
         breakId: bn.getAttribute("breakId"),
-        tracking: new TrackingEvents(bn, ad),
+        tracking: null,
         position: position
       };
 
-      var targetedAdHandler = adHandler.bind(that, that.breaks.length);
+      var targetedAdHandler = adHandler.bind(that, that.breaks.length, position);
 
       var vast = bn.getElementsByTagNameNS(VMAPNS, 'VASTData');
       if (vast) {
         adbreak.ad = new VASTAds(vast.item(0).getElementByTagName(null, 'VAST').item(0), targetedAdHandler);
+        adbreak.tracking = new TrackingEvents(bn, adbreak.ad);
       } else {
         var uri = bn.getElementsByTagNameNS(VMAPNS, 'AdTagURI');
         if (uri) {
-          var storeAd = function(ad) {
-            adbreak.ad = ad;
-            if (ad !== null) {
-              targetedAdHandler(ad);
-            }
-          };
+          var storeAd;
+          (function(bn, adbreak) {
+            storeAd = function(ad) {
+              adbreak.ad = ad;
+              adbreak.tracking = new TrackingEvents(bn, ad);
+              if (ad !== null) {
+                targetedAdHandler(ad);
+              }
+            };
+          })(bn, adbreak);
           queryVAST(uri.item(0).textContent.replace(/\s/g, ""), storeAd);
         } else {
           console.error("No supported ad target for break #" + i);
@@ -345,35 +386,6 @@ VMAP.prototype.onBreakStart = function(break_index) {
 VMAP.prototype.onBreakEnd = function(break_index) {
   this.breaks[break_index].tracking.track("breakEnd");
 };
-
-/**
- * Queries the given VAST endpoint for ads and calls the given function when the
- * ads have been loaded, giving the corresponding VASTAds object
- *
- * @param {string} endpoint The VAST endpoint URL
- * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
- *   null if the request to the endpoint failed
- * @param {?VASTAd} parentAd The ad containing the results from this query
- */
-function queryVAST(endpoint, onFetched, parentAd) {
-  fetchXML(endpoint, null, function(doc) {
-    try {
-      new VASTAds(doc, onFetched, parentAd);
-    } catch(e) {
-      console.error(e.toString());
-      var s = e.stack.split(/\n/);
-      for (var i = 0; i < s.length; i++) {
-        var msg = s[i];
-        msg = msg.replace("[arguments not available]", "");
-        msg = msg.replace(/http:\/\/.*?resources\//, "");
-        console.debug("\t" + msg);
-      }
-    }
-  }, function (e) {
-    console.error("Failed to load VAST from '" + endpoint + "':", e);
-    onFetched(null);
-  });
-}
 
 /**
  * Represents one VAST response which might contain multiple ads
@@ -421,14 +433,17 @@ function VASTAds(root, onAdsAvailable, parentAd) {
       uri = uri.item(0).textContent.replace(/\s/g, "");
       var allowPods = wrapper.getAttribute("allowMultipleAds") === "true";
 
-      var onGotFirstAd = function(ads) {
-        ad.onLoaded(ads, allowPods);
-        if (that.onAdsAvailable) {
-          var oaf = that.onAdsAvailable;
-          that.onAdsAvailable = null;
-          oaf.call(that, that);
-        }
-      };
+      var onGotFirstAd;
+      (function(ad, allowPods, that) {
+        onGotFirstAd = function(ads) {
+          ad.onLoaded(ads, allowPods);
+          if (that.onAdsAvailable) {
+            var oaf = that.onAdsAvailable;
+            that.onAdsAvailable = null;
+            oaf.call(that, that);
+          }
+        };
+      })(ad, allowPods, that);
       queryVAST(uri, onGotFirstAd, ad);
     }
   }
@@ -449,7 +464,7 @@ VASTAds.prototype.getAd = function(allowPods) {
   var ad = null;
   if (allowPods) {
     ad = this.getAdWithSequence(1);
-    if (ad && !had.current().isEmpty()) {
+    if (ad && !ad.current().isEmpty()) {
       return ad.current();
     }
   }
@@ -526,7 +541,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
   /**
    * Copy over tracking and creatives from parent
    */
-  var i;
+  var i, k;
   if (this.parentAd !== null) {
     var pa = this.parentAd;
 
@@ -549,7 +564,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
       this.nonlinearsTracking = pa.nonlinearsTracking.copy(this);
     }
 
-    for (var k in pa.properties) {
+    for (k in pa.properties) {
       if (pa.properties.hasOwnProperty(k)) {
         this.properties[k] = pa.properties[k];
       }
@@ -659,7 +674,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
         /* falls through */
       case "NonLinearAds":
         var tag = creative.tagName.replace("Ads", "");
-        var cls = tag === "Companion" ? VASTCompanion : VASTNonLinear;
+        var cls = tag === "Companion" ? "VASTCompanion" : "VASTNonLinear";
         var arr = tag === "Companion" ? this.companions : this.nonlinears;
 
         if (tag === "NonLinear") {
@@ -673,9 +688,9 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
 
         var items = creative.getElementsByTagName(tag);
         for (var j = 0; j < items.length; j++) {
-          n = new cls(this, items.item(j));
+          n = new window[cls](this, items.item(j));
 
-          for (var k = 0; k < arrl; k++) {
+          for (k = 0; k < arrl; k++) {
             var o = arr[k];
 
             // Match if two values are equal or only one is set
@@ -815,6 +830,8 @@ VASTAd.prototype.hasData = function() {
 /**
  * Returns the next ad after this one (if any)
  *
+ * TODO: In VAST 2.0, this should return any next ad, not just based on seq
+ *
  * @return {?VASTAd} The next ad or null
  */
 VASTAd.prototype.getNextAd = function() {
@@ -860,7 +877,7 @@ VASTAd.prototype.getCompanions = function() {
  */
 VASTAd.prototype.getCompanion = function(id) {
   for (var i = 0; i < this.companions.length; i++) {
-    if (this.companions[i].attribute('id') == id) {
+    if (this.companions[i].attribute('id') === id) {
       return this.companions[i];
     }
   }
@@ -956,11 +973,11 @@ VASTCreative.prototype.track = function(ev, position, asset) {
  * @return {string} Timestamp as timecode
  */
 VASTCreative.prototype.timecodeToString = function(time) {
-  var hrs = '0' + parseInt(time/3600);
-  var mts = '0' + parseInt((time % 3600)/60);
+  var hrs = '0' + parseInt(time/3600, 10);
+  var mts = '0' + parseInt((time % 3600)/60, 10);
   var scs = '0' + time % 60;
   var str = hrs + ':' + mts + ':' + scs;
-  return str.replace(/(^|:|\.)0(\d{2})/g, "\1\2");
+  return str.replace(/(^|:|\.)0(\d{2})/g, "$1$2");
 };
 
 /**
@@ -975,9 +992,9 @@ VASTCreative.prototype.timecodeFromString = function(time) {
     return time;
   }
 
-  return parseInt(time.substr(0,2), 10) * 3600
-       + parseInt(time.substr(3,2), 10) * 60
-       + parseInt(time.substr(6,2), 10);
+  return parseInt(time.substr(0,2), 10) * 3600 +
+         parseInt(time.substr(3,2), 10) * 60 +
+         parseInt(time.substr(6,2), 10);
 };
 
 /**
@@ -1082,7 +1099,7 @@ VASTLinear.prototype = Object.create(VASTCreative.prototype);
  */
 VASTLinear.prototype.getDuration = function() {
   return this.duration;
-}
+};
 
 /**
  * Returns a new, but identical VASTLinear object pointing to the given ad
@@ -1320,7 +1337,7 @@ VASTStatic.prototype.extractClicks = function(prefix) {
 
   el = this.root.getElementsByTagName(prefix + "ClickTracking");
   if (el.length) {
-    this.tracking.addClickTracking(el.item(i).textContent.replace(/\s/g, ""));
+    this.tracking.addClickTracking(el.item(0).textContent.replace(/\s/g, ""));
   }
 };
 
