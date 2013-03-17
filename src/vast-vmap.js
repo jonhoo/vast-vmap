@@ -1,4 +1,5 @@
 /* jshint loopfunc:true,sub:true */
+// TODO: timecodeTo/FromString should not be on VASTCreative - useful elsewhere
 
 /**
  * @const
@@ -509,6 +510,7 @@ VASTAds.prototype.getAdWithSequence = function(seq) {
  * TODO: Add interface for reporting errors, possibly also "rejecting" the ad
  * TODO: Add interface for getting ad properties like AdSystem
  * TODO: Add support for <Icons> as dictated by the standard
+ * TODO: Add method for tracking impression without tracking creative view
  *
  * @constructor
  * @param {VASTAds} vast Parent VAST record
