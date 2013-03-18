@@ -325,7 +325,7 @@ function VMAP(server, adHandler, breakHandler) {
       var adbreak = {
         ad: null,
         breakId: bn.getAttribute("breakId"),
-        tracking: null,
+        tracking: new TrackingEvents(bn, null),
         position: position
       };
 
@@ -334,20 +334,18 @@ function VMAP(server, adHandler, breakHandler) {
       var vast = bn.getElementsByTagNameNS(VMAPNS, 'VASTData');
       if (vast) {
         adbreak.ad = new VASTAds(vast.item(0).getElementByTagName(null, 'VAST').item(0), targetedAdHandler);
-        adbreak.tracking = new TrackingEvents(bn, adbreak.ad);
       } else {
         var uri = bn.getElementsByTagNameNS(VMAPNS, 'AdTagURI');
         if (uri) {
           var storeAd;
-          (function(bn, adbreak) {
+          (function(adbreak) {
             storeAd = function(ad) {
               adbreak.ad = ad;
-              adbreak.tracking = new TrackingEvents(bn, ad);
               if (ad !== null) {
                 targetedAdHandler(ad);
               }
             };
-          })(bn, adbreak);
+          })(adbreak);
           queryVAST(uri.item(0).textContent.replace(/\s/g, ""), storeAd);
         } else {
           console.error("No supported ad target for break #" + i);
