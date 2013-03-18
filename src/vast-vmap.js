@@ -285,19 +285,19 @@ TrackingEvents.prototype.track = function(ev, macros) {
  *
  * @constructor
  * @param {string} server The server URL to contact to retrieve the VMAP
- * @param {function} breakHandler The function to call when Ad Breaks have been
- *   fetched. This function will receive a list of break positions. Each
- *   position can either be a percentage (<1), a number of seconds into the
- *   content video or one of the string literals "start" or "end". Ordinal
- *   positions are not supported and thus will not be passed.
  * @param {function(number, string, VASTAds)} adHandler The function to call
  *   whenever the VAST ad response for an ad break has been fetched and/or
  *   parsed. This function will be called at most once for every ad break given
  *   to breakHandler. The first parameter to the function is the corresponding
  *   index in the list passed to the breakHandler, and the second parameter is
  *   the VASTAds object holding the possible ads to play for that break.
+ * @param {?function} breakHandler The function to call when Ad Breaks have been
+ *   fetched. This function will receive a list of break positions. Each
+ *   position can either be a percentage (<1), a number of seconds into the
+ *   content video or one of the string literals "start" or "end". Ordinal
+ *   positions are not supported and thus will not be passed.
  */
-function VMAP(server, breakHandler, adHandler) {
+function VMAP(server, adHandler, breakHandler) {
   /**
    * List of objects representing an ad break.
    * Each object has the following indices:
@@ -358,7 +358,10 @@ function VMAP(server, breakHandler, adHandler) {
       that.breaks.push(adbreak);
       breakPositions.push(adbreak.position);
     }
-    breakHandler(breakPositions);
+
+    if (typeof breakHandler === 'function') {
+      breakHandler(breakPositions);
+    }
   }, function(e) {
     console.error("Failed to load VMAP from '" + server + "':", e);
     breakHandler([]);
