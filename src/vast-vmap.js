@@ -509,7 +509,6 @@ VASTAds.prototype.getAdWithSequence = function(seq) {
  * Beware, beyond lies dragons and pits of fire.
  *
  * TODO: Add interface for reporting errors, possibly also "rejecting" the ad
- * TODO: Add interface for getting ad properties like AdSystem
  * TODO: Add support for <Icons> as dictated by the standard
  * TODO: Add method for tracking impression without tracking creative view
  *
@@ -910,7 +909,7 @@ VASTAd.prototype.getNonLinears = function() {
 /**
  * A base class for VAST Creative elements
  *
- * TODO: Add support for getting adParameters
+ * TODO: Add support for getting adParameters and duration (for Linears)
  *
  * @param {VASTAd} ad The ad holding this creative
  * @param {Element} root The root node of this creative in the VAST XML
