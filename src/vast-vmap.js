@@ -196,7 +196,7 @@ TrackingEvents.prototype.addClickTracking = function(url) {
  * Returns all events of the given types
  *
  * @param {string[]} evs Event types to look for
- * @return {object[]} A list of objects each representing one tracked event.
+ * @returns {object[]} A list of objects each representing one tracked event.
  *   Every object contains an "event" index holding the event name and
  *   optionally an "attributes" index holding a key-value mapping of any
  *   additional attributes for the event (like "offset" for progress events).
@@ -371,7 +371,7 @@ function VMAP(server, adHandler, breakHandler) {
  * available
  *
  * @param {number} break_index The index of the break that is starting
- * @return {?VASTAds} The ad data for this break or null if it has not yet been
+ * @returns {?VASTAds} The ad data for this break or null if it has not yet been
  *   fetched
  */
 VMAP.prototype.onBreakStart = function(break_index) {
@@ -460,7 +460,7 @@ function VASTAds(root, onAdsAvailable, parentAd) {
  * more ads are loaded
  *
  * @param {boolean} allowPods whether to allow ad pods (multiple videos) or not
- * @return {VASTAd} An ad.
+ * @returns {VASTAd} An ad.
  */
 VASTAds.prototype.getAd = function(allowPods) {
   var ad = null;
@@ -491,7 +491,7 @@ VASTAds.prototype.getAd = function(allowPods) {
  * Returns the ad with the given sequence number
  *
  * @param {number} seq The sequence number of the ad to get
- * @return {?VASTAd} The ad with the given sequence number or null
+ * @returns {?VASTAd} The ad with the given sequence number or null
  */
 VASTAds.prototype.getAdWithSequence = function(seq) {
   for (var i = 0; i < this.ads.length; i++) {
@@ -733,7 +733,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
  * @param {string} tag The attribute to get
  * @param {*} [nothing] Value to return if tag isn't present. Defaults to
  *   undefined
- * @return {?string} The value for that tag for this ad or default if unset
+ * @returns {?string} The value for that tag for this ad or default if unset
  */
 VASTAd.prototype.getTag = function(tag, nothing) {
   if (!this.properties.hasOwnProperty(tag)) {
@@ -764,7 +764,7 @@ VASTAd.prototype.onLoaded = function(ads, allowPods) {
 /**
  * Returns true if impression metrics has been sent for this ad, false otherwise
  *
- * @return {boolean} true if impression metrics have been sent, false otherwise
+ * @returns {boolean} true if impression metrics have been sent, false otherwise
  */
 VASTAd.prototype.hasSentImpression = function() {
   return this.sentImpression;
@@ -783,7 +783,7 @@ VASTAd.prototype.impressionSent = function() {
  * For normal ads, this should just return this ad, for pods, it should return
  * the current ad withing the pod
  *
- * @return {VASTAd} the representative ad for this ad
+ * @returns {VASTAd} the representative ad for this ad
  */
 VASTAd.prototype.current = function() {
   return this.currentPodAd;
@@ -793,7 +793,7 @@ VASTAd.prototype.current = function() {
  * Determines if this ad has the given sequence number
  *
  * @param {number} seq The target sequence number
- * @return {boolean} true if this ad has the given sequence number, false
+ * @returns {boolean} true if this ad has the given sequence number, false
  *   otherwise
  */
 VASTAd.prototype.isNumber = function(seq) {
@@ -803,7 +803,7 @@ VASTAd.prototype.isNumber = function(seq) {
 /**
  * Determines if this ad has a sequence number
  *
- * @return {boolean} true if this ad has a sequence number, false otherwise
+ * @returns {boolean} true if this ad has a sequence number, false otherwise
  */
 VASTAd.prototype.hasSequence = function() {
   return this.sequence !== null;
@@ -812,7 +812,7 @@ VASTAd.prototype.hasSequence = function() {
 /**
  * Determine if this ad has any content (wrapped or inline) or not
  *
- * @return {boolean} True if this <Ad> contains a <Wrapper> or <InLine>, false
+ * @returns {boolean} True if this <Ad> contains a <Wrapper> or <InLine>, false
  *   otherwise
  */
 VASTAd.prototype.isEmpty = function() {
@@ -823,7 +823,7 @@ VASTAd.prototype.isEmpty = function() {
  * Determines if the current VASTAd has inline data. Returns false if it is a
  * wrapper ad entry that has not yet been loaded.
  *
- * @return {boolean} True if this ad contains an <InLine>, false otherwise
+ * @returns {boolean} True if this ad contains an <InLine>, false otherwise
  */
 VASTAd.prototype.hasData = function() {
   return this.loaded;
@@ -834,7 +834,7 @@ VASTAd.prototype.hasData = function() {
  *
  * TODO: In VAST 2.0, this should return any next ad, not just based on seq
  *
- * @return {?VASTAd} The next ad or null
+ * @returns {?VASTAd} The next ad or null
  */
 VASTAd.prototype.getNextAd = function() {
   if (this.vast !== this.pod) {
@@ -854,7 +854,7 @@ VASTAd.prototype.getNextAd = function() {
 /**
  * Returns the linear creative element associated with this ad.
  *
- * @return {?VASTLinear} the linear creative element associated with this ad or
+ * @returns {?VASTLinear} the linear creative element associated with this ad or
  *   null
  */
 VASTAd.prototype.getLinear = function() {
@@ -864,7 +864,7 @@ VASTAd.prototype.getLinear = function() {
 /**
  * Returns all companion banners associated with this ad.
  *
- * @return {VASTCompanion[]} all companion banners associated with this ad
+ * @returns {VASTCompanion[]} all companion banners associated with this ad
  */
 VASTAd.prototype.getCompanions = function() {
   return this.companions;
@@ -890,7 +890,7 @@ VASTAd.prototype.getCompanion = function(id) {
 /**
  * Returns one of "all", "any" or "none" in accordance with the VAST spec
  *
- * @return {string} all|any|none
+ * @returns {string} all|any|none
  */
 VASTAd.prototype.companionsRequired = function() {
   return this.companionsRequired;
@@ -899,7 +899,7 @@ VASTAd.prototype.companionsRequired = function() {
 /**
  * Returns all non-linear creative elements associated with this ad.
  *
- * @return {VASTNonLinear[]} all non-linear creative elements associated with
+ * @returns {VASTNonLinear[]} all non-linear creative elements associated with
  *   this ad
  */
 VASTAd.prototype.getNonLinears = function() {
@@ -972,7 +972,7 @@ VASTCreative.prototype.track = function(ev, position, asset) {
  * Takes a timestamp and returns it as a timecode string HH:MM:SS
  *
  * @param {number} time Timestamp in seconds
- * @return {string} Timestamp as timecode
+ * @returns {string} Timestamp as timecode
  */
 VASTCreative.prototype.timecodeToString = function(time) {
   var hrs = '0' + parseInt(time/3600, 10);
@@ -1002,7 +1002,7 @@ VASTCreative.prototype.timecodeFromString = function(time) {
 /**
  * Returns the URL to send the user to if this creative is clicked
  *
- * @return {?string} URL to send the user to or null if none has been set
+ * @returns {?string} URL to send the user to or null if none has been set
  */
 VASTCreative.prototype.getClickThrough = function() {
   return this.clickThrough;
@@ -1019,7 +1019,7 @@ VASTCreative.prototype.getClickThrough = function() {
  * @param {string} name The attribute name
  * @param {*} [nothing] Value to return if attribute isn't present. Defaults to
  *   undefined
- * @return {?string} The value for that attribute for this creative or default
+ * @returns {?string} The value for that attribute for this creative or default
  *   if unset
  */
 VASTCreative.prototype.attribute = function(name, nothing) {
@@ -1097,7 +1097,7 @@ VASTLinear.prototype = Object.create(VASTCreative.prototype);
 /**
  * Returns the duration for this linear creative, or null if not set
  *
- * @return {?number} The duration of this linear in seconds, null otherwise
+ * @returns {?number} The duration of this linear in seconds, null otherwise
  */
 VASTLinear.prototype.getDuration = function() {
   return this.duration;
@@ -1142,7 +1142,7 @@ VASTLinear.prototype.augment = function(other) {
  *   - src
  * according to the VAST specification.
  *
- * @return {object[]} a list of media files for this linear
+ * @returns {object[]} a list of media files for this linear
  */
 VASTLinear.prototype.getAllMedias = function() {
   return this.mediaFiles;
@@ -1157,7 +1157,7 @@ VASTLinear.prototype.getAllMedias = function() {
  *
  * @param {{width: number, height: number, ?bitrate: number}} target The target
  *   video settings
- * @return {?object} a single media file with the properties given for each
+ * @returns {?object} a single media file with the properties given for each
  *   object in getAllMedias() or null if no media file is available
  */
 VASTLinear.prototype.getBestMedia = function(target) {
@@ -1316,7 +1316,7 @@ VASTStatic.prototype.augment = function(other) {
 /**
  * Returns all resources associated with this creative.
  *
- * @return {{?iframe: string, ?html: string, ?images}} an object representing
+ * @returns {{?iframe: string, ?html: string, ?images}} an object representing
  *   each of the possible resources that can be used to render this creative.
  *   The iframe and html indexes have their respective URLs as values, whereas
  *   images is a list of object, each with a src and type attribute
@@ -1388,7 +1388,7 @@ VASTCompanion.prototype.augment = function(other) {
 /**
  * Returns the alt text given for this creative
  *
- * @return {string} alternative text for this creative
+ * @returns {string} alternative text for this creative
  */
 VASTCompanion.prototype.getAltText = function() {
   return this.altText;
