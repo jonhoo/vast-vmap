@@ -29,4 +29,8 @@ buster.testCase("Single wrapped ad", {
       assert.equals(this.ad.linear.mediaFiles.length, 4);
   },
 
+  "finds linear media files": function() {
+      assert.equals(this.ad.linear.duration, 3661);
+  },
+
 })
