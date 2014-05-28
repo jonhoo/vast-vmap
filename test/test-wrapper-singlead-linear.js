@@ -22,6 +22,11 @@ buster.testCase("Single wrapped ad", {
 
   "finds linear click through": function() {
     assert.equals(this.ad.linear.clickThrough, "http://linear.test.com");
+
+  },
+
+  "finds linear media files": function() {
+      assert.equals(this.ad.linear.mediaFiles.length, 4);
   },
 
 })
