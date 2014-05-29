@@ -1119,6 +1119,8 @@ VASTLinear.prototype.copy = function(ad) {
  * @param {VASTLinear} other VASTLinear object to merge into this one
  */
 VASTLinear.prototype.augment = function(other) {
+  this.duration = other.duration || this.duration;
+  this.mediaFiles = other.mediaFiles.slice(0) || this.mediaFiles.slice(0);
   this.tracking.augment(other.tracking);
   this.clickThrough = other.clickThrough || this.clickThrough;
 };
