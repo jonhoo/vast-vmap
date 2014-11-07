@@ -947,6 +947,7 @@ function VASTCreative(ad, root) {
  *   - acceptInvitation
  *   - close
  *   - progress
+ *   - skip
  *
  * The video player should report these whenever possible, except all the
  * progress events (start, complete, midpoint and *Quartile), which should only
@@ -1205,11 +1206,13 @@ VASTLinear.prototype.getBestMedia = function(target) {
 
 /** @const **/
 var VAST_LINEAR_TRACKING_POINTS = ['start',
-                                   'firstQuartile',
-                                   'midpoint',
-                                   'thirdQuartile',
-                                   'complete',
-                                   'progress'];
+  'firstQuartile',
+  'midpoint',
+  'thirdQuartile',
+  'complete',
+  'progress',
+  'skip'
+];
 
 /**
  * Returns a list of positions in the playback of this ad when track() should be
@@ -1249,6 +1252,10 @@ VASTLinear.prototype.getTrackingPoints = function() {
       case "complete":
         point["offset"] = "end";
         break;
+      case "skip":
+        var skipOffset = this.attribute('skipoffset', 0);
+        point["offset"] = "" + Math.round((skipOffset / this.duration) * 100) + "%";
+        break;
       default:
         // progress-...
         var offset = events[i]["offset"];
@@ -1256,12 +1263,36 @@ VASTLinear.prototype.getTrackingPoints = function() {
           continue;
         }
 
-        point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
+        point["offset"] = Math.round(VASTCreative.prototype.timecodeFromString(offset) / this.duration * 100) + "%";
     }
     points.push(point);
   }
 
-  return points;
+  // Now sort all events based on their offset. 'Start' events automatically
+  // added to the beginning, 'end' events added at the end.
+  var sortable = [];
+  for (var index in points) {
+      var val = parseInt(points[index]['offset']);
+      if (points[index]['offset'] == 'start') {
+          val = 0;
+      }
+      else if (points[index]['offset'] == 'complete') {
+          val = 100;
+      }
+
+      sortable.push([index, val]);
+  }
+
+  sortable.sort(function(a, b) {
+      return a[1] - b[1];
+  });
+
+  var retval = [];
+  for (var i = 0; i < sortable.length; i++) {
+      retval.push(points[sortable[i][0]]);
+  }
+
+  return retval;
 };
 
 /**
