@@ -54,6 +54,11 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * @param {?VASTAd} parentAd The ad containing the results from this query
  */
 function queryVAST(endpoint, onFetched, parentAd) {
+
+  if (queryVAST.user_callback === null) {
+    queryVAST.user_callback = onFetched;
+  }
+
   fetchXML(endpoint, null, function(doc) {
     try {
       new VASTAds(doc, onFetched, parentAd);
@@ -66,12 +71,17 @@ function queryVAST(endpoint, onFetched, parentAd) {
         msg = msg.replace(/http:\/\/.*?resources\//, "");
         console.debug("\t" + msg);
       }
+
+      queryVAST.user_callback (null);
     }
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
-    onFetched(null);
+    queryVAST.user_callback (null);
   });
 }
+
+queryVAST.user_callback = null;
+
 
 /**
  * Extracts tracking events from the given XML fragment
@@ -148,6 +158,13 @@ TrackingEvents.prototype.copy = function(ad) {
  * @param {string} url The URL to request
  */
 TrackingEvents.prototype.finger = function(url) {
+  if (typeof window === 'object' && typeof Image !== 'undefined') {
+    // use an image where possible to avoid CORS errors in the console
+    var track = new Image();
+    track.src = url;
+    return;
+  }
+
   var request = new XMLHttpRequest();
   request.open("get", url, true);
   request.send();
@@ -408,6 +425,12 @@ function VASTAds(root, onAdsAvailable, parentAd) {
   this.ads = [];
   this.onAdsAvailable = onAdsAvailable;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
+
+  if (!adElements || adElements.length === 0) {
+    console.warn('No ads found in VAST response.');
+    throw ({message: "No ads found in VAST response."});
+  }
+
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
     if (ad.isEmpty()) {
