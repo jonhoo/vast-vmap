@@ -143,11 +143,21 @@ TrackingEvents.prototype.copy = function(ad) {
 
 
 /**
- * Sends a GET request to the given URL
+ * Sends a GET request to the given URL. Attempts to set the src
+ * on a new `Image` object first and falls back to a normal
+ * `XMLHttpRequest` in the event that the code is not running
+ * in a browser.
  *
  * @param {string} url The URL to request
  */
 TrackingEvents.prototype.finger = function(url) {
+  if (typeof window === 'object' && typeof Image !== 'undefined') {
+    // use an image where possible to avoid CORS errors in the console
+    var track = new Image();
+    track.src = url;
+    return;
+  }
+
   var request = new XMLHttpRequest();
   request.open("get", url, true);
   request.send();
