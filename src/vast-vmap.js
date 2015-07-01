@@ -49,14 +49,20 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * ads have been loaded, giving the corresponding VASTAds object
  *
  * @param {string} endpoint The VAST endpoint URL
- * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
- *   null if the request to the endpoint failed
+ * @param {function(?VASTAds)} onFetched Function to call when ads fetched
+ * @param {?function()} onError onError function to call when no ads are present
+ *   or request to the endpoint failed
  * @param {?VASTAd} parentAd The ad containing the results from this query
  */
-function queryVAST(endpoint, onFetched, parentAd) {
+function queryVAST(endpoint, onFetched, onError, parentAd) {
+
+  if (queryVAST.user_callback === null) {
+    queryVAST.user_callback = onFetched;
+  }
+
   fetchXML(endpoint, null, function(doc) {
     try {
-      new VASTAds(doc, onFetched, parentAd);
+      new VASTAds(doc, onFetched, onError, parentAd);
     } catch(e) {
       console.error(e.toString());
       var s = e.stack.split(/\n/);
@@ -69,7 +75,7 @@ function queryVAST(endpoint, onFetched, parentAd) {
     }
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
-    onFetched(null);
+    onError();
   });
 }
 
@@ -414,8 +420,9 @@ VMAP.prototype.onBreakEnd = function(break_index) {
  *   callback is required. The call to getBestAd() might change over time as
  *   more ads become available.
  */
-function VASTAds(root, onAdsAvailable, parentAd) {
+function VASTAds(root, onAdsAvailable, onError, parentAd) {
   this.ads = [];
+  this.onAdsError = onError;
   this.onAdsAvailable = onAdsAvailable;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
   for (var i = 0; i < adElements.length; i++) {
@@ -446,6 +453,13 @@ function VASTAds(root, onAdsAvailable, parentAd) {
       var allowPods = wrapper.getAttribute("allowMultipleAds") === "true";
 
       var onGotFirstAd;
+      var onAdError = function () {
+        if (that.onAdsError) {
+          var oae = that.onAdsError;
+          that.onAdsError = null;
+          oae.call();
+        }
+      };
       (function(ad, allowPods, that) {
         onGotFirstAd = function(ads) {
           ad.onLoaded(ads, allowPods);
@@ -453,10 +467,12 @@ function VASTAds(root, onAdsAvailable, parentAd) {
             var oaf = that.onAdsAvailable;
             that.onAdsAvailable = null;
             oaf.call(that, that);
+          } else {
+            onAdError();
           }
         };
       })(ad, allowPods, that);
-      queryVAST(uri, onGotFirstAd, ad);
+      queryVAST(uri, onGotFirstAd, onAdError, ad);
     }
   }
 }
