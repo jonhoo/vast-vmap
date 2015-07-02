@@ -49,14 +49,15 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * ads have been loaded, giving the corresponding VASTAds object
  *
  * @param {string} endpoint The VAST endpoint URL
- * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
- *   null if the request to the endpoint failed
+ * @param {function(?VASTAds)} onFetched Function to call when ads fetched
+ * @param { {function()}} onError Function to call when no ads are fetched
+ *   or there was an error requesting the endpoint
  * @param {?VASTAd} parentAd The ad containing the results from this query
  */
-function queryVAST(endpoint, onFetched, parentAd) {
+function queryVAST(endpoint, onFetched, onError, parentAd) {
   fetchXML(endpoint, null, function(doc) {
     try {
-      new VASTAds(doc, onFetched, parentAd);
+      new VASTAds(doc, onFetched, onError, parentAd);
     } catch(e) {
       console.error(e.toString());
       var s = e.stack.split(/\n/);
@@ -66,10 +67,12 @@ function queryVAST(endpoint, onFetched, parentAd) {
         msg = msg.replace(/http:\/\/.*?resources\//, "");
         console.debug("\t" + msg);
       }
+
+      onError();
     }
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
-    onFetched(null);
+    onError();
   });
 }
 
@@ -389,6 +392,8 @@ VMAP.prototype.onBreakEnd = function(break_index) {
   this.breaks[break_index].tracking.track("breakEnd");
 };
 
+var onReceivedErrorCounter = 0;
+
 /**
  * Represents one VAST response which might contain multiple ads
  *
@@ -404,13 +409,30 @@ VMAP.prototype.onBreakEnd = function(break_index) {
  *   callback is required. The call to getBestAd() might change over time as
  *   more ads become available.
  */
-function VASTAds(root, onAdsAvailable, parentAd) {
+function VASTAds(root, onAdsAvailable, onError, parentAd) {
   this.ads = [];
   this.onAdsAvailable = onAdsAvailable;
+  this.onAdsError = onError;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
+
+  var onAdError = function () {
+    onReceivedErrorCounter++;
+    if (that.onAdsError) {
++      var oae = that.onAdsError;
++      that.onAdsError = null;
++      oae.call();
++    }
+  }
+
+  if (onReceivedErrorCounter == adElements.length) {
+    onAdError();
+    return;
+  }
+
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
     if (ad.isEmpty()) {
+      onAdError();
       continue;
     }
 
@@ -446,7 +468,7 @@ function VASTAds(root, onAdsAvailable, parentAd) {
           }
         };
       })(ad, allowPods, that);
-      queryVAST(uri, onGotFirstAd, ad);
+      queryVAST(uri, onGotFirstAd, onAdError, ad);
     }
   }
 }
