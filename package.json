@@ -1,26 +1,27 @@
 {
-    "author": "Jon Gjengset <jon@tsp.io>",
-    "contributors": [ ],
-    "name": "vast-vmap",
-    "description": "JavaScript library for working with the IAB VAST and VMAP standards",
-    "version": "0.0.1",
-    "homepage": "https://github.com/jonhoo/vast-vmap",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/jonhoo/vast-vmap"
-    },
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT"
-        }
-    ],
-    "private": false,
-    "devDependencies": {
-      "grunt": ">= 0.4.0",
-      "grunt-exec": "git://github.com/jharding/grunt-exec.git",
-      "grunt-contrib-jshint": "~0.2.0",
-      "grunt-contrib-uglify": "~0.1.2"
-    },
-    "optionalDependencies": {}
+  "author": "Jon Gjengset <jon@tsp.io>",
+  "contributors": [],
+  "name": "vast-vmap",
+  "description": "JavaScript library for working with the IAB VAST and VMAP standards",
+  "version": "0.0.1",
+  "homepage": "https://github.com/jonhoo/vast-vmap",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonhoo/vast-vmap"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT"
+    }
+  ],
+  "private": false,
+  "devDependencies": {
+    "buster": "^0.7.18",
+    "grunt": ">= 0.4.0",
+    "grunt-contrib-jshint": "~0.2.0",
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-exec": "git://github.com/jharding/grunt-exec.git"
+  },
+  "optionalDependencies": {}
 }
