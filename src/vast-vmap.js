@@ -427,15 +427,10 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
 
   var onAdError = function () {
     onReceivedErrorCounter++;
-    if (that.onAdsError) {
-       var oae = that.onAdsError;
-       that.onAdsError = null;
-       oae.call();
-+    }
   }
 
   if (onReceivedErrorCounter == adElements.length) {
-    onAdError();
+    onError();
     return;
   }
 
