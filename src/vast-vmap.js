@@ -392,8 +392,6 @@ VMAP.prototype.onBreakEnd = function(break_index) {
   this.breaks[break_index].tracking.track("breakEnd");
 };
 
-var onReceivedErrorCounter = 0;
-
 /**
  * Represents one VAST response which might contain multiple ads
  *
@@ -413,15 +411,17 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
   this.ads = [];
   this.onAdsAvailable = onAdsAvailable;
   this.onAdsError = onError;
+  this.onReceivedErrorCounter = 0;
   var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
 
-  var onAdError = function () {
-    onReceivedErrorCounter++;
-  }
+  var that = this;
 
-  if (onReceivedErrorCounter == adElements.length) {
-    onError();
-    return;
+  var onAdError = function () {
+    that.onReceivedErrorCounter++;
+    if (that.onReceivedErrorCounter == adElements.length) {
+      onError();
+      return;
+    }
   }
 
   for (var i = 0; i < adElements.length; i++) {
@@ -441,7 +441,6 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
         oaf.call(this, this);
       }
     } else {
-      var that = this;
       var wrapper = adElements.item(i).getElementsByTagName('Wrapper').item(0);
       var uri = wrapper.getElementsByTagName('VASTAdTagURI');
       if (uri.length === 0) {
