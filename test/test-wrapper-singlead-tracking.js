@@ -1,3 +1,6 @@
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
+
 buster.testCase("Single wrapped ad tracking", {
   prepare: function(done) {
     var that = this;
@@ -15,7 +18,7 @@ buster.testCase("Single wrapped ad tracking", {
       ad.sentImpression = false;
       ad = ad.parentAd;
     }
-    this.server = this.sandbox.useFakeServer();
+    this.server = this.useFakeServer();
   },
 
   tearDown: function() {

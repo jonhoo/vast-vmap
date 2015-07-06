@@ -1,3 +1,6 @@
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
+
 buster.testCase("Single wrapped ad", {
   prepare: function(done) {
     var that = this;

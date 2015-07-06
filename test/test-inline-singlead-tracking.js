@@ -1,3 +1,6 @@
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
+
 buster.testCase("Single inline ad tracking", {
   prepare: function(done) {
     var that = this;
@@ -11,7 +14,7 @@ buster.testCase("Single inline ad tracking", {
     this.ad = this.vast.getAd();
     // Reset the only value that is really modified.
     this.ad.sentImpression = false;
-    this.server = this.sandbox.useFakeServer();
+    this.server = this.useFakeServer();
   },
 
   tearDown: function() {

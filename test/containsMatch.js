@@ -1,3 +1,6 @@
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
+
 function containsMatch(haystack, needle) {
   for (var i in haystack) {
     if (!haystack.hasOwnProperty(i)) { continue; }
@@ -11,12 +14,12 @@ function containsMatch(haystack, needle) {
   return false;
 }
 
-buster.assertions.add("containsMatch", {
+buster.referee.add("containsMatch", {
     assert: function (haystack, needle) {
-      var f = buster.assertions.fail;
-      buster.assertions.fail = function (message) { throw new AssertionError(message) };
+      var f = buster.referee.fail;
+      buster.referee.fail = function (message) { throw new AssertionError(message) };
       var cm = containsMatch(haystack, needle);
-      buster.assertions.fail = f;
+      buster.referee.fail = f;
       return cm;
     },
     assertMessage: "${0} expected to contain match for ${1}!",

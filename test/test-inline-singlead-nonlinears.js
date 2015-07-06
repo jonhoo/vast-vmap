@@ -1,3 +1,6 @@
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
+
 buster.testCase("Single inline ad nonlinears", {
   prepare: function(done) {
     var that = this;

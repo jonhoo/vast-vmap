@@ -151,7 +151,7 @@ TrackingEvents.prototype.copy = function(ad) {
  * @param {string} url The URL to request
  */
 TrackingEvents.prototype.finger = function(url) {
-  if (typeof window === 'object' && typeof Image !== 'undefined') {
+  if (typeof window === 'object' && typeof Image !== 'undefined' && typeof buster === 'undefined') {
     // use an image where possible to avoid CORS errors in the console
     var track = new Image();
     track.src = url;
