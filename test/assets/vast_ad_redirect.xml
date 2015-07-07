@@ -1,0 +1,10 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="3.0">
+ <Ad id="101124619">
+  <Wrapper>
+   <AdSystem>GDFP</AdSystem>
+   <VASTAdTagURI><![CDATA[./vast_wrapper_no_ads.xml]]></VASTAdTagURI>
+  </Wrapper>
+ </Ad>
+</VAST>
