@@ -3,7 +3,7 @@ abuster.testCase("Empty wrappers", {
 
   prepare: function(done) {
     var that = this;
-    queryVAST("./test/assets/vast_ad_redirect.xml", function(ads) {
+    queryVAST("./test/assets/vast_empty.xml", function(ads) {
       that.vast = ads;
       done();
     }, function() {
