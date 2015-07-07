@@ -418,11 +418,11 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
 
   var onAdError = function () {
     that.onReceivedErrorCounter++;
-    if (that.onReceivedErrorCounter == adElements.length) {
+    if (that.onReceivedErrorCounter === adElements.length) {
       onError();
       return;
     }
-  }
+  };
 
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
