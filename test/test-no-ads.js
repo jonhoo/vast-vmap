@@ -1,23 +1,22 @@
-abuster.testCase("Empty wrappers", {
-  errorCounter: 0,
+var assert = buster.referee.assert;
+var refute = buster.referee.refute;
 
-  prepare: function(done) {
+buster.testCase("Empty VAST", {
+  setUp: function(done) {
     var that = this;
+    this.numErrors = 0;
+
     queryVAST("./test/assets/vast_empty.xml", function(ads) {
       that.vast = ads;
       done();
     }, function() {
-      that.errorCounter++;
+      that.numErrors++;
+      done();
     });
   },
 
-  setUp: function() {
-    this.ad = this.vast.getAd();
-    this.ad.sentImpression = false;
-  },
-
   "called onError once": function() {
-    assert.equals(this.errorCounter, 1);
+    assert.equals(this.numErrors, 1);
   },
 
 })
