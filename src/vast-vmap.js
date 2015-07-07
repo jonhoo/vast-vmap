@@ -426,6 +426,11 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
 
   var that = this;
 
+  if (adElements.length == 0) {
+    onError();
+    return
+  }
+
   var onAdError = function () {
     that.onReceivedErrorCounter++;
     if (that.onReceivedErrorCounter === adElements.length) {
@@ -454,7 +459,7 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
       var wrapper = adElements.item(i).getElementsByTagName('Wrapper').item(0);
       var uri = wrapper.getElementsByTagName('VASTAdTagURI');
       if (uri.length === 0) {
-        // No uri...
+        onAdError();
         continue;
       }
 
