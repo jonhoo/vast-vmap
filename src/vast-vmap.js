@@ -1265,27 +1265,48 @@ var VAST_LINEAR_TRACKING_POINTS = ['start',
 VASTLinear.prototype.getTrackingPoints = function() {
   var events = this.tracking.getEventsOfTypes(VAST_LINEAR_TRACKING_POINTS);
   var points = [];
+
+  var duration = null;
+  if (typeof this.duration !== 'undefined' && this.duration) {
+    duration = this.duration;
+  }
+
   for (var i = 0; i < events.length; i++) {
-    var point = {"event": events[i]["event"], "offset": null};
+    var point = {"event": events[i]["event"], "offset": null, "timelapse": null};
     switch (events[i]["event"]) {
       case "start":
         point["offset"] = "start";
+        point['timelapse'] = 0;
         break;
       case "firstQuartile":
         point["offset"] = "25%";
+        if (duration) {
+          point['timelapse'] = duration * 0.25;
+        }
         break;
       case "midpoint":
         point["offset"] = "50%";
+        if (duration) {
+          point['timelapse'] = duration * 0.5;
+        }
         break;
       case "thirdQuartile":
         point["offset"] = "75%";
+        if (duration) {
+          point['timelapse'] = duration * 0.75;
+        }
         break;
       case "complete":
         point["offset"] = "end";
+        if (duration) {
+          point['timelapse'] = duration;
+        }
         break;
       case "skip":
-        var skipOffset = this.attribute('skipoffset', 0);
-        point["offset"] = "" + Math.round((skipOffset / this.duration) * 100) + "%";
+        point["timelapse"] = this.attribute('skipoffset', 0);
+        if (duration) {
+          point["offset"] = this.attritube('skipoffset', 0) / duration;
+        }
         break;
       default:
         // progress-...
@@ -1294,21 +1315,23 @@ VASTLinear.prototype.getTrackingPoints = function() {
           continue;
         }
 
-        point["offset"] = Math.round(VASTCreative.prototype.timecodeFromString(offset) / this.duration * 100) + "%";
+        point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
     }
     points.push(point);
   }
 
-  // Now sort all events based on their offset. 'Start' events automatically
-  // added to the beginning, 'end' events added at the end.
   var sortable = [];
   for (var index in points) {
-    var val = parseInt(points[index]['offset']);
-    if (points[index]['offset'] == 'start') {
-      val = 0;
-    }
-    else if (points[index]['offset'] == 'complete') {
-      val = 100;
+    var val = parseInt(points[index]['timelapse']);
+    if (!val) {
+      val = parseInt(points[index]['offset']);
+
+      if (points[index]['offset'] == 'start') {
+        val = 0;
+      }
+      else if (points[index]['offset'] == 'complete') {
+        val = 100;
+      }
     }
 
     sortable.push([index, val]);
@@ -1319,11 +1342,11 @@ VASTLinear.prototype.getTrackingPoints = function() {
   });
 
   var retval = [];
-  for (var i = 0; i < sortable.length; i++) {
-    retval.push(points[sortable[i][0]]);
+  for (var j = 0; j < sortable.length; j++) {
+    retval.push(points[sortable[j][0]]);
   }
 
-  return retval;
+  return retval
 };
 
 /**
