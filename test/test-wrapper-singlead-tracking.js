@@ -108,7 +108,7 @@ buster.testCase("Single wrapped ad tracking", {
 
   "parses wrapped percentage progress offset": function() {
     assert.containsMatch(this.ad.linear.getTrackingPoints(), {
-      "offset": "20%"
+      "percentOffset": "20%"
     });
   },
 

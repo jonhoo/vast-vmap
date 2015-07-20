@@ -1265,26 +1265,56 @@ var VAST_LINEAR_TRACKING_POINTS = ['start',
 VASTLinear.prototype.getTrackingPoints = function() {
   var events = this.tracking.getEventsOfTypes(VAST_LINEAR_TRACKING_POINTS);
   var points = [];
+
+  var duration = null;
+  if (typeof this.duration !== 'undefined' && this.duration) {
+    duration = this.duration;
+  }
+
   for (var i = 0; i < events.length; i++) {
-    var point = {"event": events[i]["event"], "offset": null};
+    var point = {"event": events[i]["event"], "offset": null, "percentOffset": null};
     switch (events[i]["event"]) {
       case "start":
-        point["offset"] = "start";
+        point["percentOffset"] = "0%";
+        point["offset"] = 0;
         break;
       case "firstQuartile":
-        point["offset"] = "25%";
+        point["percentOffset"] = "25%";
+        if (duration) {
+          point["offset"] = duration * 0.25;
+        }
         break;
       case "midpoint":
-        point["offset"] = "50%";
+        point["percentOffset"] = "50%";
+        if (duration) {
+          point["offset"] = duration * 0.5;
+        }
         break;
       case "thirdQuartile":
-        point["offset"] = "75%";
+        point["percentOffset"] = "75%";
+        if (duration) {
+          point["offset"] = duration * 0.75;
+        }
         break;
       case "complete":
-        point["offset"] = "end";
+        point["percentOffset"] = "100%";
+        if (duration) {
+          point["offset"] = duration;
+        }
         break;
       case "skip":
-        point["offset"] = this.attribute('skipoffset', 0);
+        var offset = this.attribute('skipoffset', 0);
+        if(offset.indexOf('%') === -1) {
+          point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
+          if (duration) {
+            point["percentOffset"] = (point["offset"] / duration * 100) + "%";
+          }
+        } else {
+          point["percentOffset"] = offset;
+          if (duration) {
+            point["offset"] = duration * parseInt(point["percentOffset"]) / 100;
+          }
+        }
         break;
       default:
         // progress-...
@@ -1292,13 +1322,39 @@ VASTLinear.prototype.getTrackingPoints = function() {
         if (!offset) {
           continue;
         }
+        if (offset == "start") {
+          offset = '0%';
+        }
+        if (offset == "end") {
+          offset = '100%';
+        }
 
-        point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
+        if(offset.indexOf('%') === -1) {
+          point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
+          if (duration) {
+            point["percentOffset"] = (point["offset"] / duration * 100) + "%";
+          }
+        } else {
+          point["percentOffset"] = offset;
+          if (duration) {
+            point["offset"] = duration * parseInt(point["percentOffset"]) / 100;
+          }
+        }
     }
     points.push(point);
   }
 
-  return points;
+  points.sort(function(a, b) {
+    if (a["offset"] && b["offset"]) {
+      return a["offset"] - b["offset"];
+    } else if (a["percentOffset"] && b["percentOffset"]) {
+      return parseInt(a["percentOffset"]) - parseInt(b["percentOffset"]);
+    }
+
+    return 0;
+  });
+
+  return points
 };
 
 /**

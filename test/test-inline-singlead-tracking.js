@@ -130,23 +130,24 @@ buster.testCase("Single inline ad tracking", {
 
   "parses percentage progress offset": function() {
     assert.containsMatch(this.ad.linear.getTrackingPoints(), {
-      "offset": "10%"
+      "percentOffset": "10%"
     });
   },
 
   "gets tracking points from non-progress events": function() {
     var match = {
-      "start": "start",
+      "start": "0%",
       "firstQuartile": "25%",
       "midpoint": "50%",
       "thirdQuartile": "75%",
-      "end": "end"
+      "end": "100%"
     };
 
     for (var ev in match) {
       assert.containsMatch(this.ad.linear.getTrackingPoints(), {
         "event": ev,
-        "offset": match[ev]
+        "percentOffset": match[ev],
+        "offset": parseInt(match[ev]) * 3661.0 / 100
       });
     }
   },
