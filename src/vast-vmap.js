@@ -1342,12 +1342,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
     return 0;
   });
 
-  var retval = [];
-  for (var j = 0; j < sortable.length; j++) {
-    retval.push(points[sortable[j][0]]);
-  }
-
-  return retval
+  return points
 };
 
 /**
