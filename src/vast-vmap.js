@@ -1322,6 +1322,12 @@ VASTLinear.prototype.getTrackingPoints = function() {
         if (!offset) {
           continue;
         }
+        if (offset == "start") {
+          offset = '0%';
+        }
+        if (offset == "end") {
+          offset = '100%';
+        }
 
         if(offset.indexOf('%') === -1) {
           point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
