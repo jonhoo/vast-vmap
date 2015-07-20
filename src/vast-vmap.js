@@ -1304,7 +1304,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
         break;
       case "skip":
         var offset = this.attribute('skipoffset', 0);
-        if(your_string.indexOf('%') === -1) {
+        if(offset.indexOf('%') === -1) {
           point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
           if (duraction) {
             point["percentOffset"] = (point["offset"] / duration * 100) + "%";
@@ -1323,9 +1323,16 @@ VASTLinear.prototype.getTrackingPoints = function() {
           continue;
         }
 
-        point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
-        if (duration) {
-          point["percentOffset"] = (point["offset"] / duration * 100) + "%";
+        if(offset.indexOf('%') === -1) {
+          point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
+          if (duraction) {
+            point["percentOffset"] = (point["offset"] / duration * 100) + "%";
+          }
+        } else {
+          point["percentOffset"] = offset;
+          if (duration) {
+            point["offset"] = duration * parseInt(point["percentOffset"]) / 100;
+          }
         }
     }
     points.push(point);
