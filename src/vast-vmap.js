@@ -237,7 +237,7 @@ TrackingEvents.prototype.getEventsOfTypes = function(evts) {
  * @param {string} ev Event type to notify
  * @param {object} macros Macros to replace in the tracking URIs
  */
-TrackingEvents.prototype.track = function(ev, macros) {
+TrackingEvents.prototype.track = function(ev, _macros) {
   if (!this.events[ev] || this.events[ev].length === 0) {
     return;
   }
@@ -245,13 +245,13 @@ TrackingEvents.prototype.track = function(ev, macros) {
   var evs = [].concat(this.events[ev]);
   var i;
 
-  for (var m in macros) {
-    if (!macros.hasOwnProperty(m)) {
+  var macros = {};
+  for (var m in _macros) {
+    if (!_macros.hasOwnProperty(m)) {
       continue;
     }
 
-    macros["[" + m + "]"] = encodeURIComponent(macros[m]);
-    delete macros[m];
+    macros["[" + m + "]"] = encodeURIComponent(_macros[m]);
   }
 
   // First creative view for a creative within an ad should count as an
