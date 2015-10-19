@@ -1107,6 +1107,11 @@ function VASTLinear(ad, root) {
     this.duration = this.timecodeFromString(d.item(0).textContent.replace(/\s/g, ""));
   }
 
+  var ap = root.getElementsByTagName("AdParameters");
+  if(ap.length){
+    this.adParameters = ap.item(0).textContent.replace(/\s/g, "");
+  }
+
   var medias = root.getElementsByTagName("MediaFiles");
   if (!medias.length) {
     return;
