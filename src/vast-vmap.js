@@ -422,7 +422,7 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
   this.onAdsAvailable = onAdsAvailable;
   this.onAdsError = onError;
   this.onReceivedErrorCounter = 0;
-  var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
+  var adElements = root.getElementsByTagNameNS("*", 'Ad');
 
   var that = this;
 
