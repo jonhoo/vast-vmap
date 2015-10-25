@@ -1085,7 +1085,8 @@ function VASTLinear(ad, root) {
   this.mediaFiles = [];
   this.clickThrough = null;
   this.duration = null;
-
+  this.adParameters = null;
+  
   var i;
 
   var clicks = root.getElementsByTagName("VideoClicks");
@@ -1105,6 +1106,11 @@ function VASTLinear(ad, root) {
   var d = root.getElementsByTagName("Duration");
   if (d.length) {
     this.duration = this.timecodeFromString(d.item(0).textContent.replace(/\s/g, ""));
+  }
+
+  var ap = root.getElementsByTagName("AdParameters");
+  if(ap.length){
+    this.adParameters = ap.item(0).textContent.replace(/\s/g, "");
   }
 
   var medias = root.getElementsByTagName("MediaFiles");
