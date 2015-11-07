@@ -25,23 +25,66 @@ var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
  *   identifier.
  */
 function fetchXML(url, identifier, onSuccess, onFailure) {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function() {
-    if (request.readyState === 4) {
-      if (request.status === 200) {
-        if (request.responseXML !== null) {
-          onSuccess(request.responseXML, identifier);
-        } else {
-          onFailure(request, identifier);
-        }
-      } else {
-        onFailure(request, identifier);
+  var request;
+
+  // IE 9 CORS method
+  if (window.XDomainRequest)
+  {
+    request = new XDomainRequest();
+
+    request.onload = function()
+    {
+
+      if (request.contentType != null && request.responseText != null)
+      {
+
+        // IE < 10 requires to parse the XML as string in order to use the getElementsByTagNameNS method
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(request.responseText, 'text/xml');
+
+        onSuccess(doc, identifier);
+
       }
-    }
-  };
+      else
+      onFailure(request, identifier);
+
+    };
+
+    request.onerror = request.ontimeout = function()
+    {
+      onFailure(request, identifier);
+    };
+
+  }
+  else // The standard one
+  {
+    request = new XMLHttpRequest();
+
+    request.onreadystatechange = function()
+    {
+
+      if (request.readyState === 4)
+      {
+
+        if (request.status === 200)
+        {
+
+          if (request.responseXML !== null)
+          onSuccess(request.responseXML, identifier);
+          else
+          onFailure(request, identifier);
+
+        } else
+        onFailure(request, identifier);
+
+      }
+    };
+
+  }
 
   request.open("GET", url, true);
-  request.send(null);
+  request.withCredentials = true;   // Accept cookies
+  request.send();
 }
 
 /**
@@ -52,8 +95,9 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * @param {function(?VASTAds)} onFetched Function to call when ads fetched or
  *   null if the request to the endpoint failed
  * @param {?VASTAd} parentAd The ad containing the results from this query
+ * @param {function(?)} onFinish Function to call when VAST request is finished
  */
-function queryVAST(endpoint, onFetched, parentAd) {
+function queryVAST(endpoint, onFetched, parentAd, onFinish) {
   fetchXML(endpoint, null, function(doc) {
     try {
       new VASTAds(doc, onFetched, parentAd);
@@ -67,9 +111,14 @@ function queryVAST(endpoint, onFetched, parentAd) {
         console.debug("\t" + msg);
       }
     }
+
+    if (onFinish) onFinish();
+
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
     onFetched(null);
+
+    if (onFinish) onFinish();
   });
 }
 
@@ -407,7 +456,13 @@ VMAP.prototype.onBreakEnd = function(break_index) {
 function VASTAds(root, onAdsAvailable, parentAd) {
   this.ads = [];
   this.onAdsAvailable = onAdsAvailable;
-  var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
+
+  // root.namespaceURI return undefined in Google Chrome 46
+  // var adElements = root.getElementsByTagNameNS(root.namespaceURI, 'Ad');
+
+  // Workaround (See https://code.google.com/p/chromium/issues/detail?id=549103)
+  var adElements = root.getElementsByTagNameNS('*', 'Ad');
+
   for (var i = 0; i < adElements.length; i++) {
     var ad = new VASTAd(this, adElements.item(i), parentAd || null);
     if (ad.isEmpty()) {
