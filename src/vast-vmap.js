@@ -46,7 +46,7 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
 
       }
       else
-      onFailure(request, identifier);
+        onFailure(request, identifier);
 
     };
 
