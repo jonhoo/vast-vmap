@@ -60,9 +60,21 @@ just haven't gotten around to them yet.
 
 # Testing #
 
-I've added som rudimentary tests using BusterJS based on some VAST 2.0 XML files
+I've added some rudimentary tests using BusterJS based on some VAST 2.0 XML files
 distributed by the IAB. Feel free to add more if you want to. Still need a good
 example VMAP document though...
+
+In order to run the tests, start by installing dev dependencies:
+
+`npm install`
+
+And then:
+
+`grunt buster:tests`
+
+You can also watch for changes and immediately run the tests:
+
+`grunt watch:tests`
 
 # Support #
 

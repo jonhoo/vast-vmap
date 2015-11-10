@@ -4,6 +4,11 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        folders : {
+            src : 'src/',
+            dist: 'dist/',
+            tests: 'test/'
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
@@ -13,8 +18,8 @@ module.exports = function (grunt) {
                     ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n'
             },
             build: {
-                src: 'src/vast-vmap.js',
-                dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.min.js'
+                src: '<%= folders.src %>vast-vmap.js',
+                dest: '<%= folders.dist %><%= pkg.name %>-<%= pkg.version %>.min.js'
             }
         },
         jshint: {
@@ -34,11 +39,24 @@ module.exports = function (grunt) {
                 devel: true
             },
             globals: {}
+        },
+        buster: {
+            tests: {
+                config: '<%= folders.test %>buster.js'
+            }
+        },
+        watch: {
+            tests: {
+                files: ['<%= folders.tests %>' + '*.js', '<%= folders.src %>' + '*.js'],
+                tasks: ['buster:tests']
+            }
         }
     });
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'buster:tests']);
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-buster');
 };
