@@ -70,7 +70,7 @@ In order to run the tests, start by installing dev dependencies:
 
 And then:
 
-`grunt buster:tests`
+`grunt test`
 
 You can also watch for changes and immediately run the tests:
 

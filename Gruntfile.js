@@ -7,7 +7,7 @@ module.exports = function (grunt) {
         folders : {
             src : 'src/',
             dist: 'dist/',
-            tests: 'test/'
+            test: 'test/'
         },
         uglify: {
             options: {
@@ -42,19 +42,25 @@ module.exports = function (grunt) {
         },
         buster: {
             tests: {
-                config: '<%= folders.test %>buster.js'
+                test: { //must be name this way for it to find the config file
+                    config: '<%= folders.test %>buster.js'
+                }
             }
         },
         watch: {
             tests: {
                 files: ['<%= folders.tests %>' + '*.js', '<%= folders.src %>' + '*.js'],
-                tasks: ['buster:tests']
+                tasks: ['test']
             }
         }
     });
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'uglify', 'buster:tests']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'test']);
+
+    // Run tests
+    grunt.registerTask('test', ['buster:tests']);
+
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
