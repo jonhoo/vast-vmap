@@ -41,20 +41,22 @@ module.exports = function (grunt) {
             globals: {}
         },
         buster: {
-            tests: {
-                config: '<%= folders.test %>buster.js'
-            }
+            config: '<%= folders.test %>buster.js'
         },
         watch: {
             tests: {
                 files: ['<%= folders.tests %>' + '*.js', '<%= folders.src %>' + '*.js'],
-                tasks: ['buster:tests']
+                tasks: ['test']
             }
         }
     });
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'uglify', 'buster:tests']);
+    grunt.registerTask('default', ['jshint', 'uglify', 'test']);
+
+    // Run tests
+    grunt.registerTask('test', ['buster']);
+
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');

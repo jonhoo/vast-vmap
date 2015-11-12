@@ -26,5 +26,8 @@
     "grunt-exec": "git://github.com/jharding/grunt-exec.git",
     "phantomjs": "^1.9.18"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
   "optionalDependencies": {}
 }
