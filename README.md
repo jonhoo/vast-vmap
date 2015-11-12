@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jonhoo/vast-vmap.svg)](https://travis-ci.org/jonhoo/vast-vmap)
 # What is this? #
 This is a JavaScript library for working with Ad Servers providing ads
 through IAB [VAST](http://www.iab.net/vast) and
