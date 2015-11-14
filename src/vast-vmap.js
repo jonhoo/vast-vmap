@@ -41,6 +41,7 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
   };
 
   request.open("GET", url, true);
+  request.withCredentials = true;   // Accept cookies
   request.send(null);
 }
 
