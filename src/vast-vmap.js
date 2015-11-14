@@ -53,8 +53,9 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * @param { {function()}} onError Function to call when no ads are fetched
  *   or there was an error requesting the endpoint
  * @param {?VASTAd} parentAd The ad containing the results from this query
+ * @param {funciton()}} onFinish Fuction to call when request is finished
  */
-function queryVAST(endpoint, onFetched, onError, parentAd) {
+function queryVAST(endpoint, onFetched, onError, parentAd, onFinish) {
   fetchXML(endpoint, null, function(doc) {
     try {
       new VASTAds(doc, onFetched, onError, parentAd);
@@ -70,9 +71,14 @@ function queryVAST(endpoint, onFetched, onError, parentAd) {
 
       onError();
     }
+
+    if (onFinish) onFinish();
+
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
     onError();
+
+    if (onFinish) onFinish();
   });
 }
 
@@ -1086,7 +1092,7 @@ function VASTLinear(ad, root) {
   this.clickThrough = null;
   this.duration = null;
   this.adParameters = null;
-  
+
   var i;
 
   var clicks = root.getElementsByTagName("VideoClicks");
