@@ -25,20 +25,57 @@ var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
  *   identifier.
  */
 function fetchXML(url, identifier, onSuccess, onFailure) {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function() {
-    if (request.readyState === 4) {
-      if (request.status === 200) {
-        if (request.responseXML !== null) {
-          onSuccess(request.responseXML, identifier);
+  var request;
+
+  // IE 9 CORS method
+  if (window.XDomainRequest)
+  {
+    request = new XDomainRequest();
+
+    request.onload = function()
+    {
+
+      if (request.contentType != null && request.responseText != null)
+      {
+
+        // IE < 10 requires to parse the XML as string in order to use the getElementsByTagNameNS method
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(request.responseText, 'text/xml');
+
+        onSuccess(doc, identifier);
+
+      }
+      else
+        onFailure(request, identifier);
+
+    };
+
+    request.onerror = request.ontimeout = function()
+    {
+      onFailure(request, identifier);
+    };
+
+  }
+  else // The standard one
+  {
+
+    request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        if (request.status === 200) {
+          if (request.responseXML !== null) {
+            onSuccess(request.responseXML, identifier);
+          } else {
+            onFailure(request, identifier);
+          }
         } else {
           onFailure(request, identifier);
         }
-      } else {
-        onFailure(request, identifier);
       }
-    }
-  };
+    };
+
+  }
 
   request.open("GET", url, true);
   request.withCredentials = true;   // Accept cookies
