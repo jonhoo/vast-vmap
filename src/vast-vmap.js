@@ -517,7 +517,7 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
           if (that.onAdsAvailable) {
             var oaf = that.onAdsAvailable;
             that.onAdsAvailable = null;
-            oaf.call(that, that);
+            oaf.call(that, ads);
           }
         };
       })(ad, allowPods, that);
