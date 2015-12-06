@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VAST version="2.0">
+    <Ad id="">
+        <Wrapper>
+            <AdSystem>sxc</AdSystem>
+            <VASTAdTagURI>
+                <![CDATA[./test/assets/vast_multiple_wrappers/vast_wrapper_3.xml]]>
+            </VASTAdTagURI>
+            <Error></Error>
+            <Impression>
+                <![CDATA[http://cdn.smartclip.net/assets/9999999/blank.gif]]>
+            </Impression>
+            <Creatives>
+                <Creative AdID="">
+                    <Linear>
+                        <VideoClicks>
+                            <ClickTracking>
+                            </ClickTracking>
+                        </VideoClicks>
+                        <TrackingEvents>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VAST version="2.0">
+    <Ad id="EAS_cu_0_12050">
+        <Wrapper>
+            <AdSystem version="EmediateAd">4.47.2</AdSystem>
+            <VASTAdTagURI>./test/assets/vast_multiple_wrappers/vast_wrapper_2.xml</VASTAdTagURI>
+            <Impression id="EAS_camp_0_235136">http://localhost</Impression>
+            <Creatives>
+                <Creative id="EAS_cre_0_411983" AdID="123456">
+                    <Linear>
+                        <TrackingEvents>
+                        </TrackingEvents>
+                        <VideoClicks>
+                        </VideoClicks>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>

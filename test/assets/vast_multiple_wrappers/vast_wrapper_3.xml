@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VAST version="2.0">
+    <Ad id="73843">
+        <Wrapper>
+            <AdSystem>SMARTX</AdSystem>
+            <VASTAdTagURI>
+                <![CDATA[./test/assets/vast_multiple_wrappers/vast_final.xml]]>
+            </VASTAdTagURI>
+            <Error></Error>
+            <Impression>
+                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=imp&crea=85529&ite=DIR_73843&cpg=DIR_6305 &adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631&ep=1448961277 &pac=1&unili=1&uuli=MTY3ODkuMDpESVJfNzM4NDM&url=]]>
+            </Impression>
+            <Creatives>
+                <Creative AdID="73843">
+                    <Linear>
+                        <VideoClicks>
+                            <ClickTracking>
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=cli&crea=85529&ite=DIR_73843&cpg =DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631&ep=1448961277 &url=]]>
+                            </ClickTracking>
+                        </VideoClicks>
+                        <TrackingEvents>
+                            <Tracking event="creativeView">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=creativeView&crea =85529&ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="start">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=start&crea=85529&ite=DIR_73843 &cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="firstQuartile">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=firstQuartile &crea=85529&ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="midpoint">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=midpoint&crea=85529 &ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="thirdQuartile">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=thirdQuartile &crea=85529&ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="complete">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=complete&crea=85529 &ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="mute">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=mute&crea=85529&ite=DIR_73843 &cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="unmute">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=unmute&crea=85529&ite =DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="pause">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=pause&crea=85529&ite=DIR_73843 &cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="resume">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=resume&crea=85529&ite =DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                            <Tracking event="fullscreen">
+                                <![CDATA[http://stats-irl.sxp.smartclip.net/count?type=fullscreen&crea=85529 &ite=DIR_73843&cpg=DIR_6305&adv=DIR_2021&plc=59654&sit=1106&net=9&pub=803&iid=5cc6ee5f-0c45-429b-b2de-95a2942ab631 &ep=1448961277&url=http://stats-irl.sxp.smartclip.net/img/trpx.gif]]>
+                            </Tracking>
+                        </TrackingEvents>
+                    </Linear>
+                </Creative>
+            </Creatives>
+        </Wrapper>
+    </Ad>
+</VAST>
