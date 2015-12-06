@@ -4,7 +4,7 @@ var refute = buster.referee.refute;
 buster.testCase("Multiple wrapped ad", {
   prepare: function(done) {
     var that = this;
-    queryVAST("./test/assets/vast_multiple/wrappers/vast_wrapper_entry.xml", function(ads) {
+    queryVAST("./test/assets/vast_multiple_wrappers/vast_wrapper_entry.xml", function(ads) {
       that.vast = ads;
       done();
     });
