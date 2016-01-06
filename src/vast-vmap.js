@@ -1109,7 +1109,7 @@ function VASTLinear(ad, root) {
   }
 
   var ap = root.getElementsByTagName("AdParameters");
-  if(ap.length){
+  if (ap.length) {
     this.adParameters = ap.item(0).textContent.replace(/\s/g, "");
   }
 
