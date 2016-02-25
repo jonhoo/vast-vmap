@@ -61,7 +61,6 @@ var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
  */
 function fetchXML(url, identifier, onSuccess, onFailure) {
   var request = VAST_VMAP_XHROptions.XMLHttpRequest();
-  VAST_VMAP_XHROptions.onBeforeSend(url, identifier, request);
   request.onreadystatechange = function() {
     if (request.readyState === 4) {
       if (request.status === 200) {
@@ -77,6 +76,7 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
   };
 
   request.open("GET", url, true);
+  VAST_VMAP_XHROptions.onBeforeSend(url, identifier, request);
   request.send(null);
 }
 
@@ -198,8 +198,8 @@ TrackingEvents.prototype.finger = function(url) {
   }
 
   var request = VAST_VMAP_XHROptions.XMLHttpRequest();
-  VAST_VMAP_XHROptions.onBeforeSend(url, "tracking-pixel", request);
   request.open("get", url, true);
+  VAST_VMAP_XHROptions.onBeforeSend(url, "tracking-pixel", request);
   request.send();
 };
 
