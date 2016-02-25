@@ -7,6 +7,41 @@
 var VMAPNS = "http://www.iab.net/vmap-1.0";
 
 /**
+ * @const
+ */
+var VAST_VMAP_XHROptions = {
+  /**
+   * Default placeholder constructor to assemble an XMLHttpRequest-like object,
+   * allowing VAST-VMAP clients to, at their own discretion, add support for older
+   * IE implementations or XDR, so long as those implementations are proxied to an
+   * XMLHttpRequest-like api.
+   *
+   * By default it returns a new XMLHttpRequest instance.
+   *
+   * @constructor
+   * @returns {XMLHttpRequest}
+   */
+  XMLHttpRequest: function () {
+    return new XMLHttpRequest();
+  },
+  /**
+   * Placeholder non-op function that allows VAST-VMAP clients to
+   * modify the XHR object prior to send in a similiar fashion the
+   * the jQuery api of the same name.
+   * Mostly you might want to set `xhr.withCredentials = true` for
+   * requests that are functions of certain urls.
+   *
+   * By default it does nothing to modify the request object in any way.
+   *
+   * @param {string} url URL being fetched
+   * @param {*} identifier, Will be passed to the onSuccess and onFailure callbacks
+   * @param {XMLHttpRequest} xhr, the xmlHttpRequest object for this fetch
+   */
+  onBeforeSend: function (url, identifier, XHR) {
+  }
+};
+
+/**
  * exports
  */
 var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
@@ -25,7 +60,7 @@ var VASTAds, VASTAd, VASTLinear, VASTNonLinear, VASTCompanion;
  *   identifier.
  */
 function fetchXML(url, identifier, onSuccess, onFailure) {
-  var request = new XMLHttpRequest();
+  var request = VAST_VMAP_XHROptions.XMLHttpRequest();
   request.onreadystatechange = function() {
     if (request.readyState === 4) {
       if (request.status === 200) {
@@ -41,6 +76,7 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
   };
 
   request.open("GET", url, true);
+  VAST_VMAP_XHROptions.onBeforeSend(url, identifier, request);
   request.send(null);
 }
 
@@ -161,8 +197,9 @@ TrackingEvents.prototype.finger = function(url) {
     return;
   }
 
-  var request = new XMLHttpRequest();
+  var request = VAST_VMAP_XHROptions.XMLHttpRequest();
   request.open("get", url, true);
+  VAST_VMAP_XHROptions.onBeforeSend(url, "tracking-pixel", request);
   request.send();
 };
 
