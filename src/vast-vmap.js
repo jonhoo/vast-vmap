@@ -38,7 +38,8 @@ var VAST_VMAP_XHROptions = {
    * @param {XMLHttpRequest} xhr, the xmlHttpRequest object for this fetch
    */
   onBeforeSend: function (url, identifier, XHR) {
-  }
+  },
+  defaultVASTAbortLimit: -1
 };
 
 /**
@@ -91,7 +92,9 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  * @param {?VASTAd} parentAd The ad containing the results from this query
  */
 function queryVAST(endpoint, onFetched, onError, parentAd) {
-  fetchXML(endpoint, null, function(doc) {
+  var e = "Reached abort limit of (" + VAST_VMAP_XHROptions.defaultVASTAbortLimit + ") wrappers.";
+  var bool = parentAd && parentAd.abortLimit === 0 && (onError(new Error(e)) || true);
+  return (bool || fetchXML(endpoint, null, function(doc) {
     try {
       new VASTAds(doc, onFetched, onError, parentAd);
     } catch(e) {
@@ -108,8 +111,8 @@ function queryVAST(endpoint, onFetched, onError, parentAd) {
     }
   }, function (e) {
     console.error("Failed to load VAST from '" + endpoint + "':", e);
-    onError();
-  });
+    onError(e);
+  })), void (0);
 }
 
 /**
@@ -468,10 +471,10 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
     return
   }
 
-  var onAdError = function () {
+  var onAdError = function (e) {
     that.onReceivedErrorCounter++;
     if (that.onReceivedErrorCounter === adElements.length) {
-      onError();
+      onError(e);
       return;
     }
   };
@@ -592,6 +595,8 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
   this.pod = vast;
   this.parentAd = parentAd;
   this.onAdAvailable = onAdAvailable;
+  this.abortLimit = parentAd ? parentAd.abortLimit > 0 ? parentAd.abortLimit - 1 :
+    parentAd.abortLimit : VAST_VMAP_XHROptions.defaultVASTAbortLimit;
   this.sequence = null;
   this.hasContent = true;
   this.loaded = true;
