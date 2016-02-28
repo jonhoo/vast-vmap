@@ -16,6 +16,9 @@ buster.testCase("Single wrapped ad", {
   },
   "has correct error message": function () {
     assert.equals(this.e.toString(), "Error: Reached abort limit of (" + 1 + ") wrappers.");
+  },
+  tearDown: function () {
+    VAST_VMAP_XHROptions.defaultVASTAbortLimit = -1
   }
 
 })
