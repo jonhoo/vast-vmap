@@ -109,6 +109,10 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
 function queryVAST(endpoint, onFetched, onError, parentAd) {
   var e = "Reached abort limit of (" + VAST_VMAP_XHROptions.defaultVASTAbortLimit + ") wrappers.";
   /**
+   * Handle the case where there's an error, but no onError provided.
+   */
+  onError = onError || function () {};
+  /**
    * Abort and call onError() immediately in the following conditions
    * 1.  There is no parentAd (this would be the root ad) AND the VAST_VMAP_XHROptions.defaultVASTAbortLimit is 0
    * 2.  There is a parentAd (this is not the root ad) AND parentAd.abortLimit is 0
