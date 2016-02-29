@@ -39,6 +39,21 @@ var VAST_VMAP_XHROptions = {
    */
   onBeforeSend: function (url, identifier, XHR) {
   },
+  /**
+   * This value provides support for infinite loops and dead ends as defined in
+   * VAST 4.0.  See chapter 2.3.5.1
+   * http://www.iab.com/guidelines/digital-video-ad-serving-template-vast-4-0/
+   *
+   * Set at `-1`, the default, to enable unrestricted VAST fetching, which may
+   * result in infinite loops, deadends, or excessive wrappers.
+   * Set at a non-zero positive value, e.g., `5`, to allow that many wrappers to 
+   * to be traversed before the VAST request sequence will be abandoned and 
+   * an error will be thrown.
+   *
+   * For the record, setting this value to `0` will result in no VAST requests being
+   * made at all.  It is unclear why you would want to do this.  The error will be 
+   * logged to the console.
+   */
   defaultVASTAbortLimit: -1
 };
 
@@ -93,8 +108,34 @@ function fetchXML(url, identifier, onSuccess, onFailure) {
  */
 function queryVAST(endpoint, onFetched, onError, parentAd) {
   var e = "Reached abort limit of (" + VAST_VMAP_XHROptions.defaultVASTAbortLimit + ") wrappers.";
-  var bool = parentAd && parentAd.abortLimit === 0 && (onError(new Error(e)) || true);
-  return (bool || fetchXML(endpoint, null, function(doc) {
+  /**
+   * Abort and call onError() immediately in the following conditions
+   * 1.  There is no parentAd (this would be the root ad) AND the VAST_VMAP_XHROptions.defaultVASTAbortLimit is 0
+   * 2.  There is a parentAd (this is not the root ad) AND parentAd.abortLimit is 0
+   *
+   * Otherwise fetch the next VAST response from endpoint.  The next ad's abortLimit is parentAd.abortLimit - 1.
+   */
+  var abort = ((!parentAd && VAST_VMAP_XHROptions.defaultVASTAbortLimit === 0) ||
+    (parentAd && parentAd.abortLimit === 0)) &&
+    (onError(new Error(e)) || true);
+
+  if (abort) {
+    /**
+     * Put this in setTimeout to avoid being burned by clients with 
+     * weird, non-standard, or no console.
+     */
+    setTimeout(function () {
+      if (typeof buster === "undefined") {
+        if ("warn" in console) {
+          console.warn(e);
+        } else {
+          console.log(e);
+        }
+      }
+    }, 0);
+  }
+
+  return (abort || fetchXML(endpoint, null, function(doc) {
     try {
       new VASTAds(doc, onFetched, onError, parentAd);
     } catch(e) {
