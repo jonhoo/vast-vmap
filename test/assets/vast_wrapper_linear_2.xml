@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="2.0">
+  <Ad id="602833">
+  <Wrapper>
+    <AdSystem>Acudeo Compatible</AdSystem>
+    <VASTAdTagURI>./test/assets/vast_wrapper_linear_1.xml</VASTAdTagURI>
+    <Error>/wrapper2/error</Error>
+    <Impression>/wrapper2/impression</Impression>
+  <Creatives>
+    <Creative AdID="602833">
+      <Linear>
+        <TrackingEvents>
+          <Tracking event="creativeView">/wrapper2/creativeView</Tracking>
+          <Tracking event="start">/wrapper2/start</Tracking>
+          <Tracking event="midpoint">/wrapper2/midpoint</Tracking>
+          <Tracking event="firstQuartile">/wrapper2/firstQuartile</Tracking>
+          <Tracking event="thirdQuartile">/wrapper2/thirdQuartile</Tracking>
+          <Tracking event="complete">/wrapper2/complete</Tracking>
+          <Tracking event="mute">/wrapper2/mute</Tracking>
+          <Tracking event="unmute">/wrapper2/unmute</Tracking>
+          <Tracking event="pause">/wrapper2/pause</Tracking>
+          <Tracking event="resume">/wrapper2/resume</Tracking>
+          <Tracking event="fullscreen">/wrapper2/fullscreen</Tracking>
+          <Tracking event="progress" offset="02:02:02">/wrapper2/progabs</Tracking>
+          <Tracking event="progress" offset="20%">/wrapper2/progrel</Tracking>
+        </TrackingEvents>
+        <VideoClicks>
+          <ClickTracking>/wrapper2/click</ClickTracking>
+        </VideoClicks>
+      </Linear>
+    </Creative>
+    <Creative AdID="602833-NonLinearTracking">
+      <NonLinearAds>
+        <TrackingEvents>
+          <Tracking event="creativeView">/wrapper2/nlcreativeView</Tracking>
+        </TrackingEvents>
+      </NonLinearAds>
+    </Creative>
+  </Creatives>
+  </Wrapper>
+  </Ad>
+</VAST>
