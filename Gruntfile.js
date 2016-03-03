@@ -37,8 +37,7 @@ module.exports = function (grunt) {
                 eqnull: true,
                 browser: true,
                 devel: true
-            },
-            globals: {}
+            }
         },
         buster: {
             tests: {
@@ -59,7 +58,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['jshint', 'uglify', 'test']);
 
     // Run tests
-    grunt.registerTask('test', ['buster:tests']);
+    grunt.registerTask('test', ['jshint', 'buster:tests']);
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');

@@ -511,9 +511,9 @@ function VASTAds(root, onAdsAvailable, onError, parentAd) {
 
   var that = this;
 
-  if (adElements.length == 0) {
+  if (adElements.length === 0) {
     onError();
-    return
+    return;
   }
 
   var onAdError = function (e) {
@@ -1366,6 +1366,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
 
   for (var i = 0; i < events.length; i++) {
     var point = {"event": events[i]["event"], "offset": null, "percentOffset": null};
+    var offset;
     switch (events[i]["event"]) {
       case "start":
         point["percentOffset"] = "0%";
@@ -1396,7 +1397,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
         }
         break;
       case "skip":
-        var offset = this.attribute('skipoffset', 0);
+        offset = this.attribute('skipoffset', 0);
         if(offset.indexOf('%') === -1) {
           point["offset"] = VASTCreative.prototype.timecodeFromString(offset);
           if (duration) {
@@ -1405,20 +1406,20 @@ VASTLinear.prototype.getTrackingPoints = function() {
         } else {
           point["percentOffset"] = offset;
           if (duration) {
-            point["offset"] = duration * parseInt(point["percentOffset"]) / 100;
+            point["offset"] = duration * parseInt(point["percentOffset"], 10) / 100;
           }
         }
         break;
       default:
         // progress-...
-        var offset = events[i]["offset"];
+        offset = events[i]["offset"];
         if (!offset) {
           continue;
         }
-        if (offset == "start") {
+        if (offset === "start") {
           offset = '0%';
         }
-        if (offset == "end") {
+        if (offset === "end") {
           offset = '100%';
         }
 
@@ -1430,7 +1431,7 @@ VASTLinear.prototype.getTrackingPoints = function() {
         } else {
           point["percentOffset"] = offset;
           if (duration) {
-            point["offset"] = duration * parseInt(point["percentOffset"]) / 100;
+            point["offset"] = duration * parseInt(point["percentOffset"], 10) / 100;
           }
         }
     }
@@ -1441,13 +1442,13 @@ VASTLinear.prototype.getTrackingPoints = function() {
     if (a["offset"] && b["offset"]) {
       return a["offset"] - b["offset"];
     } else if (a["percentOffset"] && b["percentOffset"]) {
-      return parseInt(a["percentOffset"]) - parseInt(b["percentOffset"]);
+      return parseInt(a["percentOffset"], 10) - parseInt(b["percentOffset"], 10);
     }
 
     return 0;
   });
 
-  return points
+  return points;
 };
 
 /**
