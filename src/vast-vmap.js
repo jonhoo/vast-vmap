@@ -794,7 +794,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
         /* falls through */
       case "NonLinearAds":
         var tag = creative.tagName.replace("Ads", "");
-        var cls = tag === "Companion" ? "VASTCompanion" : "VASTNonLinear";
+        var Cls = tag === "Companion" ? VASTCompanion : VASTNonLinear;
         var arr = tag === "Companion" ? this.companions : this.nonlinears;
 
         if (tag === "NonLinear") {
@@ -808,7 +808,7 @@ function VASTAd(vast, root, parentAd, onAdAvailable) {
 
         var items = creative.getElementsByTagName(tag);
         for (var j = 0; j < items.length; j++) {
-          n = new window[cls](this, items.item(j));
+          n = new Cls(this, items.item(j));
 
           for (k = 0; k < arrl; k++) {
             var o = arr[k];
